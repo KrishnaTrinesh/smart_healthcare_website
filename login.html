@@ -1,0 +1,757 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Login • Smart Healthcare</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #0f172a;
+      --card: #111827;
+      --muted: #94a3b8;
+      --text: #e5e7eb;
+      --brand: #22c55e;
+      --brand-2: #06b6d4;
+      --accent: #a78bfa;
+      --danger: #ef4444;
+      --warning: #f59e0b;
+      --surface: #0b1220;
+      --ring: rgba(34, 197, 94, 0.35);
+      --shadow: 0 10px 25px rgba(0,0,0,.35);
+      --radius: 14px;
+    }
+    * { box-sizing: border-box; }
+    html, body { height: 100%; }
+    body {
+      margin: 0;
+      font-family: "Inter", system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", sans-serif;
+      color: var(--text);
+      background: radial-gradient(1200px 600px at 20% -10%, rgba(6, 182, 212, 0.2), transparent 60%),
+                  radial-gradient(1000px 500px at 80% 10%, rgba(167, 139, 250, 0.18), transparent 60%),
+                  linear-gradient(180deg, #0b1020 0%, #0a0f1b 100%);
+      min-height: 100%;
+      display: flex;
+      flex-direction: column;
+    }
+    a { color: inherit; text-decoration: none; }
+    .container { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
+
+    /* Navbar */
+    .nav {
+      position: sticky; top: 0; z-index: 50;
+      background: rgba(11, 16, 32, 0.7);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+    }
+    .nav-inner {
+      display: flex; align-items: center; justify-content: space-between;
+      height: 64px;
+    }
+    .brand {
+      display: flex; align-items: center; gap: 10px; font-weight: 700;
+      letter-spacing: 0.2px;
+    }
+    .brand-mark {
+      width: 34px; height: 34px; border-radius: 10px;
+      background: conic-gradient(from 180deg at 50% 50%, var(--brand), var(--brand-2), var(--accent), var(--brand));
+      box-shadow: 0 0 0 3px rgba(34,197,94,0.15), 0 8px 20px rgba(6,182,212,0.25);
+    }
+    .nav-links { display: flex; align-items: center; gap: 14px; }
+    .nav-links a {
+      padding: 8px 12px; border-radius: 10px; color: var(--muted);
+      border: 1px solid transparent;
+    }
+    .nav-links a:hover {
+      color: var(--text); border-color: rgba(255,255,255,0.08);
+      background: rgba(255,255,255,0.03);
+    }
+    .cta {
+      background: linear-gradient(135deg, var(--brand), var(--brand-2));
+      color: #051016; padding: 8px 14px; border-radius: 10px; font-weight: 700;
+      box-shadow: 0 6px 20px rgba(34,197,94,0.35);
+      border: 1px solid rgba(255,255,255,0.12);
+    }
+    .cta:hover { filter: brightness(1.05); }
+
+    /* Login Form */
+    .login-container {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 40px 0;
+    }
+    .login-card {
+      background: radial-gradient(600px 200px at 10% 0%, rgba(6,182,212,0.15), transparent 50%),
+                  linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.00));
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: var(--radius);
+      padding: 40px;
+      box-shadow: var(--shadow);
+      width: 100%;
+      max-width: 480px;
+    }
+    .login-header {
+      text-align: center;
+      margin-bottom: 32px;
+    }
+    .login-icon {
+      width: 60px; height: 60px; border-radius: 16px;
+      background: linear-gradient(135deg, var(--brand), var(--brand-2));
+      display: flex; align-items: center; justify-content: center;
+      margin: 0 auto 16px;
+      box-shadow: 0 8px 25px rgba(34,197,94,0.3);
+    }
+    .login-icon::before {
+      content: "🔐";
+      font-size: 24px;
+    }
+    .login-title {
+      font-size: 28px; font-weight: 700; margin: 0 0 8px;
+      background: linear-gradient(135deg, #fff, #d5fbe3 35%, #b6f3ff 70%, #e6deff);
+      -webkit-background-clip: text; background-clip: text; color: transparent;
+    }
+    .login-subtitle {
+      color: var(--muted); margin: 0; font-size: 16px;
+    }
+
+    /* Role Selection */
+    .role-selector {
+      margin-bottom: 24px;
+    }
+    .role-options {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+    .role-option {
+      padding: 12px 16px;
+      border: 2px solid rgba(255,255,255,0.08);
+      border-radius: 10px;
+      background: rgba(255,255,255,0.02);
+      cursor: pointer;
+      transition: all 0.2s ease;
+      text-align: center;
+    }
+    .role-option:hover {
+      border-color: rgba(255,255,255,0.18);
+      background: rgba(255,255,255,0.05);
+    }
+    .role-option.selected {
+      border-color: var(--brand);
+      background: rgba(34,197,94,0.1);
+      box-shadow: 0 0 0 3px rgba(34,197,94,0.15);
+    }
+    .role-option .role-icon {
+      font-size: 20px;
+      margin-bottom: 4px;
+    }
+    .role-option .role-name {
+      font-weight: 600;
+      font-size: 14px;
+    }
+    .role-option .role-desc {
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 2px;
+    }
+
+    /* Form Fields */
+    .form-group {
+      margin-bottom: 20px;
+    }
+    .form-label {
+      display: block; margin-bottom: 8px; color: var(--muted);
+      font-weight: 600; font-size: 14px;
+    }
+    .form-input {
+      width: 100%; padding: 12px 16px; border-radius: 10px;
+      background: rgba(15, 22, 40, 0.8); color: var(--text);
+      border: 1px solid rgba(255,255,255,0.08);
+      font-size: 16px; transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+    .form-input:focus {
+      outline: none; border-color: var(--brand);
+      box-shadow: 0 0 0 3px rgba(34,197,94,0.15);
+    }
+    .form-input::placeholder {
+      color: var(--muted);
+    }
+    .login-button {
+      width: 100%; padding: 14px; border-radius: 10px;
+      background: linear-gradient(135deg, var(--brand), var(--brand-2));
+      color: #051016; font-weight: 700; font-size: 16px;
+      border: none; cursor: pointer; transition: filter 0.2s ease;
+      box-shadow: 0 6px 20px rgba(34,197,94,0.35);
+    }
+    .login-button:hover {
+      filter: brightness(1.05);
+    }
+    .login-button:active {
+      transform: translateY(1px);
+    }
+    .login-footer {
+      text-align: center; margin-top: 24px; color: var(--muted);
+    }
+    .login-footer a {
+      color: var(--brand); font-weight: 600;
+    }
+    .login-footer a:hover {
+      text-decoration: underline;
+    }
+    .register-link {
+      margin-top: 16px; padding-top: 16px;
+      border-top: 1px solid rgba(255,255,255,0.08);
+    }
+
+    /* Role-specific styling */
+    .role-user .login-icon::before { content: "👤"; }
+    .role-doctor .login-icon::before { content: "👨‍⚕️"; }
+    .role-admin .login-icon::before { content: "⚙️"; }
+
+    .role-user .login-title { color: var(--brand); }
+    .role-doctor .login-title { color: var(--brand-2); }
+    .role-admin .login-title { color: var(--accent); }
+
+    /* Footer */
+    footer {
+      margin-top: auto; padding: 20px 0; color: var(--muted); font-size: 14px;
+      border-top: 1px solid rgba(255,255,255,0.06);
+    }
+
+    /* Responsive */
+    @media (max-width: 640px) {
+      .login-card {
+        margin: 0 20px; padding: 32px 24px;
+      }
+      .role-options {
+        grid-template-columns: 1fr;
+      }
+      .nav-inner { height: auto; padding: 12px 0; gap: 12px; flex-wrap: wrap; }
+      .nav-links { width: 100%; flex-wrap: wrap; gap: 8px; }
+    }
+  </style>
+</head>
+<body>
+  <header class="nav">
+    <div class="container nav-inner" role="navigation" aria-label="Primary">
+      <div class="brand">
+        <div class="brand-mark" aria-hidden="true"></div>
+        <span>Smart Healthcare</span>
+      </div>
+      <nav class="nav-links">
+        <a href="index.html">Home</a>
+        <a href="booking.html">Booking</a>
+        <a href="queue.html">Queue</a>
+        <a href="prescriptions.html">Prescriptions</a>
+        <a href="doctors.html">Doctors</a>
+        <a href="login.html" aria-current="page">Login</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="login-container">
+    <div class="login-card">
+      <div class="login-header">
+        <div class="login-icon" aria-hidden="true"></div>
+        <h1 class="login-title">Smart Healthcare Login</h1>
+        <p class="login-subtitle">Select your role and sign in to your account</p>
+      </div>
+      
+      <!-- Role Selection -->
+      <div class="role-selector">
+        <div class="role-options">
+          <div class="role-option" data-role="user">
+            <div class="role-icon">👤</div>
+            <div class="role-name">Patient</div>
+            <div class="role-desc">Book appointments & manage prescriptions</div>
+          </div>
+          <div class="role-option" data-role="doctor">
+            <div class="role-icon">👨‍⚕️</div>
+            <div class="role-name">Doctor</div>
+            <div class="role-desc">Manage schedule & patient queue</div>
+          </div>
+          <div class="role-option" data-role="admin">
+            <div class="role-icon">⚙️</div>
+            <div class="role-name">Admin</div>
+            <div class="role-desc">System administration & management</div>
+          </div>
+        </div>
+      </div>
+      
+      <form id="loginForm">
+        <div class="form-group">
+          <label for="username" class="form-label" id="usernameLabel">Email Address</label>
+          <input 
+            type="text" 
+            id="username" 
+            name="username" 
+            class="form-input" 
+            placeholder="Enter your email address"
+            required
+          />
+        </div>
+        
+        <div class="form-group">
+          <label for="password" class="form-label">Password</label>
+          <input 
+            type="password" 
+            id="password" 
+            name="password" 
+            class="form-input" 
+            placeholder="Enter your password"
+            required
+          />
+        </div>
+        
+        <button type="submit" class="login-button" id="loginButton">
+          Sign In
+        </button>
+      </form>
+      
+      <div class="login-footer">
+        <div class="register-link" id="registerSection" style="display: none;">
+          <p>Don't have an account? <a href="user-register.html">Register here</a></p>
+        </div>
+        <p>Need help? <a href="mailto:support@smarthealthcare.com">Contact Support</a></p>
+      </div>
+    </div>
+  </main>
+
+  <footer>
+    <div class="container">
+      © <span id="year"></span> Smart Healthcare. All rights reserved.
+    </div>
+  </footer>
+
+  <script>
+    document.getElementById('year').textContent = new Date().getFullYear();
+    
+    // Embedded doctors data to avoid CORS issues
+    const doctorsData = {
+      "doctors": [
+        {
+          "id": "DOC001",
+          "name": "Dr. Sarah Johnson",
+          "specialty": "Cardiology",
+          "email": "sarah.johnson@smarthealthcare.com",
+          "phone": "+1-555-0101",
+          "experience": "15 years",
+          "rating": 4.8,
+          "availability": "Mon-Fri 9AM-5PM",
+          "password": "doc123"
+        },
+        {
+          "id": "DOC002",
+          "name": "Dr. Michael Chen",
+          "specialty": "Cardiology",
+          "email": "michael.chen@smarthealthcare.com",
+          "phone": "+1-555-0102",
+          "experience": "12 years",
+          "rating": 4.9,
+          "availability": "Mon-Wed-Fri 8AM-4PM",
+          "password": "doc123"
+        },
+        {
+          "id": "DOC003",
+          "name": "Dr. David Smith",
+          "specialty": "Cardiology",
+          "email": "david.smith@smarthealthcare.com",
+          "phone": "+1-555-0103",
+          "experience": "18 years",
+          "rating": 4.7,
+          "availability": "Tue-Thu 10AM-6PM",
+          "password": "doc123"
+        },
+        {
+          "id": "DOC004",
+          "name": "Dr. Emily Rodriguez",
+          "specialty": "Neurology",
+          "email": "emily.rodriguez@smarthealthcare.com",
+          "phone": "+1-555-0104",
+          "experience": "10 years",
+          "rating": 4.7,
+          "availability": "Tue-Thu-Sat 10AM-6PM",
+          "password": "doc123"
+        },
+        {
+          "id": "DOC005",
+          "name": "Dr. James Wilson",
+          "specialty": "Neurology",
+          "email": "james.wilson@smarthealthcare.com",
+          "phone": "+1-555-0105",
+          "experience": "18 years",
+          "rating": 4.9,
+          "availability": "Mon-Fri 7AM-3PM",
+          "password": "doc123"
+        },
+        {
+          "id": "DOC006",
+          "name": "Dr. Lisa Thompson",
+          "specialty": "Neurology",
+          "email": "lisa.thompson@smarthealthcare.com",
+          "phone": "+1-555-0106",
+          "experience": "8 years",
+          "rating": 4.6,
+          "availability": "Wed-Fri 9AM-5PM",
+          "password": "doc123"
+        },
+        {
+          "id": "DOC007",
+          "name": "Dr. Robert Kim",
+          "specialty": "Pediatrics",
+          "email": "robert.kim@smarthealthcare.com",
+          "phone": "+1-555-0107",
+          "experience": "20 years",
+          "rating": 4.9,
+          "availability": "Mon-Thu 8AM-4PM",
+          "password": "doc123"
+        },
+        {
+          "id": "DOC008",
+          "name": "Dr. Maria Garcia",
+          "specialty": "Pediatrics",
+          "email": "maria.garcia@smarthealthcare.com",
+          "phone": "+1-555-0108",
+          "experience": "14 years",
+          "rating": 4.8,
+          "availability": "Mon-Wed-Fri 9AM-5PM",
+          "password": "doc123"
+        },
+        {
+          "id": "DOC009",
+          "name": "Dr. John Anderson",
+          "specialty": "Pediatrics",
+          "email": "john.anderson@smarthealthcare.com",
+          "phone": "+1-555-0109",
+          "experience": "16 years",
+          "rating": 4.7,
+          "availability": "Tue-Thu-Sat 8AM-4PM",
+          "password": "doc123"
+        },
+        {
+          "id": "DOC010",
+          "name": "Dr. Jennifer Lee",
+          "specialty": "Orthopedics",
+          "email": "jennifer.lee@smarthealthcare.com",
+          "phone": "+1-555-0110",
+          "experience": "13 years",
+          "rating": 4.8,
+          "availability": "Mon-Fri 8AM-4PM",
+          "password": "doc123"
+        },
+        {
+          "id": "DOC011",
+          "name": "Dr. William Brown",
+          "specialty": "Orthopedics",
+          "email": "william.brown@smarthealthcare.com",
+          "phone": "+1-555-0111",
+          "experience": "22 years",
+          "rating": 4.9,
+          "availability": "Mon-Wed-Fri 7AM-3PM",
+          "password": "doc123"
+        },
+        {
+          "id": "DOC012",
+          "name": "Dr. Susan Davis",
+          "specialty": "Orthopedics",
+          "email": "susan.davis@smarthealthcare.com",
+          "phone": "+1-555-0112",
+          "experience": "11 years",
+          "rating": 4.6,
+          "availability": "Tue-Thu 9AM-5PM",
+          "password": "doc123"
+        },
+        {
+          "id": "DOC013",
+          "name": "Dr. Mark Taylor",
+          "specialty": "Dermatology",
+          "email": "mark.taylor@smarthealthcare.com",
+          "phone": "+1-555-0113",
+          "experience": "9 years",
+          "rating": 4.7,
+          "availability": "Mon-Wed-Fri 10AM-6PM",
+          "password": "doc123"
+        },
+        {
+          "id": "DOC014",
+          "name": "Dr. Amanda White",
+          "specialty": "Dermatology",
+          "email": "amanda.white@smarthealthcare.com",
+          "phone": "+1-555-0114",
+          "experience": "7 years",
+          "rating": 4.5,
+          "availability": "Tue-Thu-Sat 9AM-5PM",
+          "password": "doc123"
+        },
+        {
+          "id": "DOC015",
+          "name": "Dr. Christopher Moore",
+          "specialty": "Dermatology",
+          "email": "christopher.moore@smarthealthcare.com",
+          "phone": "+1-555-0115",
+          "experience": "12 years",
+          "rating": 4.8,
+          "availability": "Mon-Fri 8AM-4PM",
+          "password": "doc123"
+        },
+        {
+          "id": "DOC016",
+          "name": "Dr. Patricia Clark",
+          "specialty": "Internal Medicine",
+          "email": "patricia.clark@smarthealthcare.com",
+          "phone": "+1-555-0116",
+          "experience": "19 years",
+          "rating": 4.9,
+          "availability": "Mon-Thu 8AM-4PM",
+          "password": "doc123"
+        },
+        {
+          "id": "DOC017",
+          "name": "Dr. Daniel Martinez",
+          "specialty": "Internal Medicine",
+          "email": "daniel.martinez@smarthealthcare.com",
+          "phone": "+1-555-0117",
+          "experience": "15 years",
+          "rating": 4.7,
+          "availability": "Mon-Wed-Fri 9AM-5PM",
+          "password": "doc123"
+        },
+        {
+          "id": "DOC018",
+          "name": "Dr. Rachel Green",
+          "specialty": "Internal Medicine",
+          "email": "rachel.green@smarthealthcare.com",
+          "phone": "+1-555-0118",
+          "experience": "17 years",
+          "rating": 4.8,
+          "availability": "Tue-Thu-Sat 8AM-4PM",
+          "password": "doc123"
+        }
+      ]
+    };
+    
+    let selectedRole = 'user';
+    
+    // Role selection
+    document.querySelectorAll('.role-option').forEach(option => {
+      option.addEventListener('click', function() {
+        // Remove selected class from all options
+        document.querySelectorAll('.role-option').forEach(opt => opt.classList.remove('selected'));
+        // Add selected class to clicked option
+        this.classList.add('selected');
+        selectedRole = this.dataset.role;
+        
+        // Update form based on role
+        updateFormForRole(selectedRole);
+      });
+    });
+    
+    function updateFormForRole(role) {
+      const card = document.querySelector('.login-card');
+      const usernameLabel = document.getElementById('usernameLabel');
+      const usernameInput = document.getElementById('username');
+      const loginButton = document.getElementById('loginButton');
+      const registerSection = document.getElementById('registerSection');
+      
+      // Remove existing role classes
+      card.classList.remove('role-user', 'role-doctor', 'role-admin');
+      card.classList.add('role-' + role);
+      
+      if (role === 'user') {
+        usernameLabel.textContent = 'Email Address';
+        usernameInput.placeholder = 'Enter your email address';
+        usernameInput.type = 'email';
+        loginButton.textContent = 'Sign In to Patient Portal';
+        registerSection.style.display = 'block';
+      } else if (role === 'doctor') {
+        usernameLabel.textContent = 'Email Address';
+        usernameInput.placeholder = 'james.wilson@smarthealthcare.com';
+        usernameInput.type = 'email';
+        loginButton.textContent = 'Sign In to Doctor Portal';
+        registerSection.style.display = 'none';
+      } else if (role === 'admin') {
+        usernameLabel.textContent = 'Admin Username';
+        usernameInput.placeholder = 'Enter admin username';
+        usernameInput.type = 'text';
+        loginButton.textContent = 'Access Admin Console';
+        registerSection.style.display = 'none';
+      }
+    }
+    
+    // Set default selection
+    document.querySelector('.role-option[data-role="user"]').classList.add('selected');
+    updateFormForRole('user');
+    
+    // Function to show available doctors
+    function showAvailableDoctors() {
+      fetch('doctors.json')
+        .then(response => response.json())
+        .then(data => {
+          let doctorList = 'Available Doctors:\n\n';
+          data.doctors.forEach((doctor, index) => {
+            doctorList += `${index + 1}. ${doctor.name}\n`;
+            doctorList += `   Specialty: ${doctor.specialty}\n`;
+            doctorList += `   Experience: ${doctor.experience}\n`;
+            doctorList += `   Rating: ${doctor.rating}/5\n`;
+            doctorList += `   Availability: ${doctor.availability}\n\n`;
+          });
+          
+          alert(doctorList + '\nLogin successful! You can now book appointments with any of these doctors.');
+          window.location.href = 'index.html';
+        })
+        .catch(error => {
+          console.error('Error loading doctors:', error);
+          alert('Login successful! Redirecting to patient dashboard...');
+          window.location.href = 'index.html';
+        });
+    }
+    
+    // Function to check doctor login
+    function checkDoctorLogin(username, password) {
+      console.log('Attempting doctor login with:', username);
+      
+      // Use embedded doctors data
+      const data = doctorsData;
+      console.log('Using embedded doctors data:', data);
+      console.log('Looking for doctor with email:', username);
+      
+      // Try to find doctor by email first, then by ID
+      let doctor = data.doctors.find(doc => doc.email === username);
+      
+      if (!doctor) {
+        console.log('Not found by email, trying ID...');
+        doctor = data.doctors.find(doc => doc.id === username);
+      }
+      
+      console.log('Found doctor:', doctor);
+      console.log('Password entered:', password);
+      console.log('Password match:', doctor && doctor.password === password);
+      
+      if (doctor && doctor.password === password) {
+        // Store doctor information in localStorage
+        localStorage.setItem('currentDoctorId', doctor.id);
+        localStorage.setItem('currentDoctorEmail', doctor.email);
+        localStorage.setItem('currentDoctorName', doctor.name);
+        localStorage.setItem('currentDoctorSpecialty', doctor.specialty);
+        
+        alert(`Welcome ${doctor.name}!\nRedirecting to doctor dashboard...`);
+        window.location.href = `doctor-dashboard.html?doctorId=${encodeURIComponent(doctor.email)}`;
+      } else {
+        console.log('Invalid credentials');
+        const loginButton = document.querySelector('.login-button');
+        loginButton.textContent = 'Sign In to Doctor Portal';
+        loginButton.disabled = false;
+        
+        if (!doctor) {
+          alert('Doctor not found. Please check your email address.\n\nFor testing:\nEmail: james.wilson@smarthealthcare.com\nPassword: doc123');
+        } else {
+          alert('Invalid password. Please check your password.\n\nFor testing:\nEmail: james.wilson@smarthealthcare.com\nPassword: doc123');
+        }
+      }
+    }
+    
+    // Form submission
+    document.getElementById('loginForm').addEventListener('submit', async function(e) {
+      e.preventDefault();
+      
+      const username = document.getElementById('username').value;
+      const password = document.getElementById('password').value;
+      
+      // Basic validation
+      if (!username || !password) {
+        alert('Please fill in all fields');
+        return;
+      }
+      
+      // Email validation for user role
+      if (selectedRole === 'user') {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(username)) {
+          alert('Please enter a valid email address');
+          return;
+        }
+      }
+
+      try {
+        const loginData = {
+          email: username,
+          password: password,
+          role: selectedRole
+        };
+        console.log('Attempting login with:', loginData);
+
+        const response = await fetch('/api/auth/login', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+          },
+          body: JSON.stringify(loginData)
+        });
+
+        console.log('Response status:', response.status);
+        const responseText = await response.text();
+        console.log('Response body:', responseText);
+
+        if (!response.ok) {
+          throw new Error(responseText || 'Login failed');
+        }
+
+        const data = JSON.parse(responseText);
+        
+        // Store the token
+        localStorage.setItem('authToken', data.access_token);
+        
+        // Redirect based on role
+        if (selectedRole === 'user') {
+          window.location.href = 'booking.html';
+        } else if (selectedRole === 'doctor') {
+          window.location.href = 'doctor-dashboard.html';
+        } else if (selectedRole === 'admin') {
+          window.location.href = 'admin.html';
+        }
+      } catch (error) {
+        alert(error.message || 'Login failed. Please try again.');
+        const loginButton = document.querySelector('.login-button');
+        loginButton.textContent = 'Sign In';
+        loginButton.disabled = false;
+      }
+      
+      // Simulate login process
+      /*const loginButton = document.querySelector('.login-button');
+      const originalText = loginButton.textContent;
+      loginButton.textContent = 'Signing In...';
+      loginButton.disabled = true;
+      
+      setTimeout(() => {
+        if (selectedRole === 'user') {
+          // Check if user account exists
+          const storedAccounts = JSON.parse(localStorage.getItem('smartHealthcareAccounts') || '[]');
+          const accountExists = storedAccounts.some(account => account.email === username.toLowerCase());
+          
+          if (accountExists) {
+            // Show available doctors for patient
+            showAvailableDoctors();
+          } else {
+            alert('No account found with this email address.\n\nPlease create an account first by clicking "Register here" below.');
+            loginButton.textContent = originalText;
+            loginButton.disabled = false;
+          }
+        } else if (selectedRole === 'doctor') {
+          // Check doctor credentials
+          checkDoctorLogin(username, password);
+        } else if (selectedRole === 'admin') {
+          // Simulate admin login
+          alert('Admin access granted! Redirecting to admin console...');
+          window.location.href = 'admin.html';
+        }
+      }, 1500);*/
+    });
+  </script>
+</body>
+</html>

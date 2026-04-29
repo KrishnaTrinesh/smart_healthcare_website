@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Test Doctor Data</title>
+</head>
+<body>
+  <h1>Test Doctor Data</h1>
+  <div id="output"></div>
+  
+  <script>
+    // Test doctor data loading
+    fetch('doctors.json')
+      .then(response => response.json())
+      .then(data => {
+        console.log('All doctors:', data.doctors);
+        
+        const output = document.getElementById('output');
+        output.innerHTML = '<h2>All Doctors:</h2>';
+        
+        data.doctors.forEach(doctor => {
+          output.innerHTML += `
+            <div style="border: 1px solid #ccc; padding: 10px; margin: 5px;">
+              <strong>ID:</strong> ${doctor.id}<br>
+              <strong>Name:</strong> ${doctor.name}<br>
+              <strong>Specialty:</strong> ${doctor.specialty}<br>
+              <strong>Email:</strong> ${doctor.email}<br>
+              <strong>Password:</strong> ${doctor.password}
+            </div>
+          `;
+        });
+        
+        // Test specific doctor
+        const testDoctor = data.doctors.find(doc => doc.id === 'DOC005');
+        if (testDoctor) {
+          output.innerHTML += `
+            <h2>Test Doctor DOC005:</h2>
+            <div style="border: 2px solid green; padding: 10px; margin: 5px; background: #f0f8f0;">
+              <strong>ID:</strong> ${testDoctor.id}<br>
+              <strong>Name:</strong> ${testDoctor.name}<br>
+              <strong>Specialty:</strong> ${testDoctor.specialty}<br>
+              <strong>Email:</strong> ${testDoctor.email}<br>
+              <strong>Password:</strong> ${testDoctor.password}
+            </div>
+          `;
+        } else {
+          output.innerHTML += '<h2 style="color: red;">Doctor DOC005 not found!</h2>';
+        }
+      })
+      .catch(error => {
+        console.error('Error loading doctors:', error);
+        document.getElementById('output').innerHTML = '<h2 style="color: red;">Error loading doctors data: ' + error.message + '</h2>';
+      });
+  </script>
+</body>
+</html>

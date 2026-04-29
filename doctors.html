@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Doctors • Smart Healthcare</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="nav">
+    <div class="container nav-inner">
+      <div class="brand"><div class="brand-mark"></div><span>Smart Healthcare</span></div>
+      <nav class="nav-links">
+        <a href="index.html">Home</a>
+        <a href="booking.html">Booking</a>
+        <a href="queue.html">Queue</a>
+        <a href="prescriptions.html">Prescriptions</a>
+        <a href="doctors.html" aria-current="page">Doctors</a>
+        <a class="cta" href="admin.html">Admin</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="section">
+    <div class="container">
+      <section class="card">
+        <h1 class="h1">Doctors</h1>
+        <p class="muted">Browse specialties and check availability.</p>
+        <div class="grid grid-3" id="doctorsGrid" style="margin-top:12px">
+          <!-- Doctors will be loaded dynamically from JSON -->
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <footer>
+    <div class="container">© <span id="year"></span> Smart Healthcare</div>
+  </footer>
+
+  <script>
+    document.getElementById('year').textContent = new Date().getFullYear();
+    
+    // Load doctors from JSON file
+    fetch('doctors.json')
+      .then(response => response.json())
+      .then(data => {
+        const doctorsGrid = document.getElementById('doctorsGrid');
+        doctorsGrid.innerHTML = '';
+        
+        data.doctors.forEach(doctor => {
+          const doctorCard = document.createElement('div');
+          doctorCard.className = 'tile';
+          doctorCard.innerHTML = `
+            <h3 style="margin:0">${doctor.name}</h3>
+            <p class="muted">${doctor.specialty} • Experience: ${doctor.experience}</p>
+            <p class="muted" style="font-size:12px; margin:4px 0">Rating: ${doctor.rating}/5 • ${doctor.availability}</p>
+            <a class="btn primary" href="booking.html?doctor=${encodeURIComponent(doctor.id)}" style="margin-top:8px">Book</a>
+          `;
+          doctorsGrid.appendChild(doctorCard);
+        });
+      })
+      .catch(error => {
+        console.error('Error loading doctors:', error);
+        document.getElementById('doctorsGrid').innerHTML = '<p class="muted">Unable to load doctors. Please try again later.</p>';
+      });
+  </script>
+</body>
+</html>

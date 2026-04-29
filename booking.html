@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Booking • Smart Healthcare</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="nav">
+    <div class="container nav-inner">
+      <div class="brand"><div class="brand-mark"></div><span>Smart Healthcare</span></div>
+      <nav class="nav-links">
+        <a href="index.html">Home</a>
+        <a href="booking.html" aria-current="page">Booking</a>
+        <a href="queue.html">Queue</a>
+        <a href="prescriptions.html">Prescriptions</a>
+        <a href="doctors.html">Doctors</a>
+        <a class="cta" href="login.html">Login</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="section">
+    <div class="container grid grid-2">
+      <section class="card">
+        <h1 class="h1">Book an Appointment</h1>
+        <p class="muted">Choose specialty, doctor, and preferred time slot.</p>
+        <form class="grid" style="gap:14px; margin-top:12px;">
+          <div>
+            <label for="specialty">Specialty</label>
+            <select id="specialty" required>
+              <option value="">Select specialty</option>
+              <!-- Specialties will be loaded dynamically -->
+            </select>
+          </div>
+          <div>
+            <label for="doctor">Doctor</label>
+            <select id="doctor" required>
+              <option value="">Select doctor</option>
+              <!-- Doctors will be loaded dynamically -->
+            </select>
+          </div>
+          <div>
+            <label for="date">Date</label>
+            <input type="date" id="date" required />
+          </div>
+          <div>
+            <label for="time">Time</label>
+            <input type="time" id="time" required />
+          </div>
+          <div>
+            <label for="symptoms">Symptoms & Prescription Details</label>
+            <textarea id="symptoms" rows="4" placeholder="Describe your symptoms, current medications, and any prescription details you want the doctor to review..." required></textarea>
+          </div>
+          <div>
+            <button type="submit" class="btn primary">Confirm Booking</button>
+          </div>
+        </form>
+      </section>
+
+      <aside class="card">
+        <h2 class="h1" style="font-size:22px;">How it works</h2>
+        <ul class="muted" style="margin:10px 0 0 16px; line-height:1.6;">
+          <li>Pick specialty and doctor</li>
+          <li>Select a convenient date & time</li>
+          <li>Receive confirmation instantly</li>
+        </ul>
+      </aside>
+    </div>
+  </main>
+
+  <footer>
+    <div class="container">© <span id="year"></span> Smart Healthcare</div>
+  </footer>
+
+  <script>
+    document.getElementById('year').textContent = new Date().getFullYear();
+    
+    // Load doctors and specialties from JSON file
+    fetch('doctors.json')
+      .then(response => response.json())
+      .then(data => {
+        const specialtySelect = document.getElementById('specialty');
+        const doctorSelect = document.getElementById('doctor');
+        
+        // Store doctors data globally for filtering
+        window.doctorsData = data.doctors;
+        
+        // Get unique specialties
+        const specialties = [...new Set(data.doctors.map(doctor => doctor.specialty))];
+        
+        // Populate specialty dropdown
+        specialties.forEach(specialty => {
+          const option = document.createElement('option');
+          option.value = specialty;
+          option.textContent = specialty;
+          specialtySelect.appendChild(option);
+        });
+        
+        // Function to filter doctors based on selected specialty
+        function filterDoctors() {
+          const selectedSpecialty = specialtySelect.value;
+          // Clear doctor dropdown completely
+          doctorSelect.innerHTML = '<option value="">Select doctor</option>';
+          
+          if (selectedSpecialty) {
+            // Filter doctors by specialty
+            const filteredDoctors = window.doctorsData.filter(doctor => doctor.specialty === selectedSpecialty);
+            
+            // Add filtered doctors to dropdown
+            filteredDoctors.forEach(doctor => {
+              const option = document.createElement('option');
+              option.value = doctor.id;
+              option.textContent = doctor.name;
+              doctorSelect.appendChild(option);
+            });
+          }
+        }
+        
+        // Add event listener for specialty change
+        specialtySelect.addEventListener('change', function() {
+          console.log('Specialty changed to:', this.value);
+          filterDoctors();
+        });
+        
+        // Initialize with empty doctor dropdown
+        filterDoctors();
+        
+        // Check if a specific doctor was selected from doctors page
+        const urlParams = new URLSearchParams(window.location.search);
+        const selectedDoctor = urlParams.get('doctor');
+        if (selectedDoctor) {
+          const doctor = data.doctors.find(doc => doc.id === selectedDoctor);
+          if (doctor) {
+            specialtySelect.value = doctor.specialty;
+            filterDoctors(); // Filter doctors first
+            doctorSelect.value = doctor.id;
+          }
+        }
+      })
+      .catch(error => {
+        console.error('Error loading doctors:', error);
+        // Fallback to hardcoded options with filtering
+        const specialtySelect = document.getElementById('specialty');
+        const doctorSelect = document.getElementById('doctor');
+
+        const fallbackSpecialties = ['Cardiology', 'Neurology', 'Pediatrics', 'Orthopedics', 'Dermatology', 'Internal Medicine'];
+        const fallbackDoctors = [
+          // Cardiology (3 doctors)
+          { id: 'DOC001', name: 'Dr. Sarah Johnson', specialty: 'Cardiology' },
+          { id: 'DOC002', name: 'Dr. Michael Chen', specialty: 'Cardiology' },
+          { id: 'DOC003', name: 'Dr. David Smith', specialty: 'Cardiology' },
+          // Neurology (3 doctors)
+          { id: 'DOC004', name: 'Dr. Emily Rodriguez', specialty: 'Neurology' },
+          { id: 'DOC005', name: 'Dr. James Wilson', specialty: 'Neurology' },
+          { id: 'DOC006', name: 'Dr. Lisa Thompson', specialty: 'Neurology' },
+          // Pediatrics (3 doctors)
+          { id: 'DOC007', name: 'Dr. Robert Kim', specialty: 'Pediatrics' },
+          { id: 'DOC008', name: 'Dr. Maria Garcia', specialty: 'Pediatrics' },
+          { id: 'DOC009', name: 'Dr. John Anderson', specialty: 'Pediatrics' },
+          // Orthopedics (3 doctors)
+          { id: 'DOC010', name: 'Dr. Jennifer Lee', specialty: 'Orthopedics' },
+          { id: 'DOC011', name: 'Dr. William Brown', specialty: 'Orthopedics' },
+          { id: 'DOC012', name: 'Dr. Susan Davis', specialty: 'Orthopedics' },
+          // Dermatology (3 doctors)
+          { id: 'DOC013', name: 'Dr. Mark Taylor', specialty: 'Dermatology' },
+          { id: 'DOC014', name: 'Dr. Amanda White', specialty: 'Dermatology' },
+          { id: 'DOC015', name: 'Dr. Christopher Moore', specialty: 'Dermatology' },
+          // Internal Medicine (3 doctors)
+          { id: 'DOC016', name: 'Dr. Patricia Clark', specialty: 'Internal Medicine' },
+          { id: 'DOC017', name: 'Dr. Daniel Martinez', specialty: 'Internal Medicine' },
+          { id: 'DOC018', name: 'Dr. Rachel Green', specialty: 'Internal Medicine' }
+        ];
+
+        // Set the fallback doctors data globally
+        window.doctorsData = fallbackDoctors;
+        
+        fallbackSpecialties.forEach(specialty => {
+          const option = document.createElement('option');
+          option.value = specialty;
+          option.textContent = specialty;
+          specialtySelect.appendChild(option);
+        });
+
+        function filterFallbackDoctors() {
+          const selected = specialtySelect.value;
+          doctorSelect.innerHTML = '<option value="">Select doctor</option>';
+          if (!selected) return;
+          fallbackDoctors
+            .filter(d => d.specialty === selected)
+            .forEach(doctor => {
+              const option = document.createElement('option');
+              option.value = doctor.id;
+              option.textContent = doctor.name;
+              doctorSelect.appendChild(option);
+            });
+        }
+
+        specialtySelect.addEventListener('change', filterFallbackDoctors);
+        filterFallbackDoctors();
+      });
+    
+    // Handle booking form submission
+    document.querySelector('form').addEventListener('submit', function(e) {
+      e.preventDefault();
+      
+      const specialty = document.getElementById('specialty').value;
+      const doctorId = document.getElementById('doctor').value;
+      const date = document.getElementById('date').value;
+      const time = document.getElementById('time').value;
+      const symptoms = document.getElementById('symptoms').value;
+      
+      if (!specialty || !doctorId || !date || !time || !symptoms) {
+        alert('Please fill in all fields');
+        return;
+      }
+      
+      // Generate prescription ID
+      const prescriptionId = 'RX-' + Date.now().toString().slice(-5);
+      
+      // Get doctor name from data
+      let doctorName = 'Unknown Doctor';
+      if (window.doctorsData) {
+        const doctor = window.doctorsData.find(d => d.id === doctorId);
+        if (doctor) doctorName = doctor.name;
+      }
+      
+      // Create new prescription
+      const newPrescription = {
+        id: prescriptionId,
+        patientId: 'user@example.com', // In real app, get from login
+        doctorId: doctorId,
+        doctorName: doctorName,
+        specialty: specialty,
+        date: date,
+        time: time,
+        symptoms: symptoms,
+        status: 'pending',
+        medicines: [],
+        notes: ''
+      };
+      
+      // Store in localStorage for demo
+      let prescriptions = JSON.parse(localStorage.getItem('userPrescriptions') || '[]');
+      prescriptions.push(newPrescription);
+      localStorage.setItem('userPrescriptions', JSON.stringify(prescriptions));
+      
+      alert(`Appointment booked successfully!\n\nPrescription ID: ${prescriptionId}\nDoctor: ${doctorName}\nDate: ${date} at ${time}\n\nYour prescription details have been sent to the doctor for review.`);
+      
+      // Reset form
+      this.reset();
+      document.getElementById('doctor').innerHTML = '<option value="">Select doctor</option>';
+    });
+  </script>
+</body>
+</html>

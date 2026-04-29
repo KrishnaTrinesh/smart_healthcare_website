@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Doctor Dashboard • Smart Healthcare</title>
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="nav">
+    <div class="container nav-inner">
+      <div class="brand"><div class="brand-mark"></div><span>Smart Healthcare</span></div>
+      <nav class="nav-links">
+        <a href="doctor-dashboard.html" aria-current="page">Dashboard</a>
+        <a href="doctor-queue.html">Patient Queue</a>
+        <a href="doctor-prescriptions.html">Prescriptions</a>
+        <a href="doctor-schedule.html">Schedule</a>
+        <a class="cta" href="login.html">Logout</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="section">
+    <div class="container">
+      <section class="card">
+        <h1 class="h1">Doctor Dashboard</h1>
+        <p class="muted">Your personal dashboard with statistics and quick actions.</p>
+        
+        <!-- Doctor Info -->
+        <div id="doctorInfo" style="background: rgba(34,197,94,0.1); border: 1px solid rgba(34,197,94,0.2); border-radius: 8px; padding: 16px; margin: 16px 0;">
+          <h3 style="margin: 0 0 8px; color: #22c55e;">Welcome, <span id="doctorName">Dr. Loading...</span></h3>
+          <p style="margin: 0; color: var(--muted);">Specialty: <span id="doctorSpecialty">Loading...</span></p>
+        </div>
+
+        <!-- Doctor Statistics -->
+        <div style="margin-top: 24px;">
+          <h2 class="h1" style="font-size: 22px;">Today's Overview</h2>
+          <p class="muted">Your daily statistics and quick actions.</p>
+          
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-top: 16px;">
+            <div style="background: rgba(34,197,94,0.1); border: 1px solid rgba(34,197,94,0.2); border-radius: 8px; padding: 16px; text-align: center;">
+              <h3 style="margin: 0 0 8px; color: #22c55e; font-size: 24px;" id="totalAppointments">0</h3>
+              <p style="margin: 0; color: var(--muted);">Total Appointments</p>
+            </div>
+            <div style="background: rgba(6,182,212,0.1); border: 1px solid rgba(6,182,212,0.2); border-radius: 8px; padding: 16px; text-align: center;">
+              <h3 style="margin: 0 0 8px; color: #06b6d4; font-size: 24px;" id="pendingAppointments">0</h3>
+              <p style="margin: 0; color: var(--muted);">Pending Reviews</p>
+            </div>
+            <div style="background: rgba(167,139,250,0.1); border: 1px solid rgba(167,139,250,0.2); border-radius: 8px; padding: 16px; text-align: center;">
+              <h3 style="margin: 0 0 8px; color: #a78bfa; font-size: 24px;" id="completedPrescriptions">0</h3>
+              <p style="margin: 0; color: var(--muted);">Completed Today</p>
+            </div>
+          </div>
+          
+          <div style="margin-top: 24px;">
+            <h3 style="margin: 0 0 16px;">Quick Actions</h3>
+            <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+              <a href="doctor-queue.html" class="btn primary">View Patient Queue</a>
+              <a href="doctor-prescriptions.html" class="btn">Manage Prescriptions</a>
+              <a href="doctor-schedule.html" class="btn">Update Schedule</a>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <footer>
+    <div class="container">© <span id="year"></span> Smart Healthcare</div>
+  </footer>
+
+  <script>
+    document.getElementById('year').textContent = new Date().getFullYear();
+    
+    // Get doctor info from URL parameters or localStorage
+    const urlParams = new URLSearchParams(window.location.search);
+    let doctorId = urlParams.get('doctorId') || localStorage.getItem('currentDoctorId');
+    
+    // Force set a test doctor ID if none found
+    if (!doctorId) {
+      doctorId = 'DOC005'; // Dr. James Wilson
+    }
+    
+    let currentDoctor = null;
+    let allPrescriptions = [];
+    
+    // Load doctor information
+    function loadDoctorInfo() {
+      console.log('Loading doctor info for ID:', doctorId);
+      
+      // Try to get from localStorage first (set during login)
+      const storedName = localStorage.getItem('currentDoctorName');
+      const storedSpecialty = localStorage.getItem('currentDoctorSpecialty');
+      const storedEmail = localStorage.getItem('currentDoctorEmail');
+      
+      if (storedName && storedSpecialty && (storedEmail === doctorId || !doctorId)) {
+        console.log('Using stored doctor info from localStorage');
+        document.getElementById('doctorName').textContent = storedName;
+        document.getElementById('doctorSpecialty').textContent = storedSpecialty;
+        
+        // Update the doctorId for statistics
+        if (storedEmail) {
+          doctorId = storedEmail;
+          currentDoctor = {
+            id: localStorage.getItem('currentDoctorId'),
+            name: storedName,
+            specialty: storedSpecialty,
+            email: storedEmail
+          };
+        }
+        
+        loadDoctorStatistics();
+        return;
+      }
+      
+      if (!doctorId) {
+        console.error('No doctor ID found');
+        document.getElementById('doctorName').textContent = 'Dr. Unknown';
+        document.getElementById('doctorSpecialty').textContent = 'Unknown Specialty';
+        return;
+      }
+      
+      fetch('doctors.json')
+        .then(response => response.json())
+        .then(data => {
+          console.log('Doctors data loaded:', data);
+          
+          // Try to find doctor by ID first
+          currentDoctor = data.doctors.find(doc => doc.id === doctorId);
+          
+          // If not found by ID, try by email
+          if (!currentDoctor && doctorId && doctorId.includes('@')) {
+            currentDoctor = data.doctors.find(doc => doc.email === doctorId);
+            console.log('Searching for doctor with email:', doctorId);
+            console.log('Found doctor by email:', currentDoctor);
+          }
+          
+          console.log('Found doctor:', currentDoctor);
+          
+          if (currentDoctor) {
+            document.getElementById('doctorName').textContent = currentDoctor.name;
+            document.getElementById('doctorSpecialty').textContent = currentDoctor.specialty;
+            
+            // Store in localStorage for future use
+            localStorage.setItem('currentDoctorId', currentDoctor.id);
+            localStorage.setItem('currentDoctorEmail', currentDoctor.email);
+            localStorage.setItem('currentDoctorName', currentDoctor.name);
+            localStorage.setItem('currentDoctorSpecialty', currentDoctor.specialty);
+            
+            loadDoctorStatistics();
+          } else {
+            // Fallback to hardcoded data
+            const fallbackDoctors = [
+              { id: 'DOC001', name: 'Dr. Sarah Johnson', specialty: 'Cardiology', email: 'sarah.johnson@smarthealthcare.com' },
+              { id: 'DOC002', name: 'Dr. Michael Chen', specialty: 'Cardiology', email: 'michael.chen@smarthealthcare.com' },
+              { id: 'DOC003', name: 'Dr. David Smith', specialty: 'Cardiology', email: 'david.smith@smarthealthcare.com' },
+              { id: 'DOC004', name: 'Dr. Emily Rodriguez', specialty: 'Neurology', email: 'emily.rodriguez@smarthealthcare.com' },
+              { id: 'DOC005', name: 'Dr. James Wilson', specialty: 'Neurology', email: 'james.wilson@smarthealthcare.com' },
+              { id: 'DOC006', name: 'Dr. Lisa Thompson', specialty: 'Neurology', email: 'lisa.thompson@smarthealthcare.com' },
+              { id: 'DOC007', name: 'Dr. Robert Kim', specialty: 'Pediatrics', email: 'robert.kim@smarthealthcare.com' },
+              { id: 'DOC008', name: 'Dr. Maria Garcia', specialty: 'Pediatrics', email: 'maria.garcia@smarthealthcare.com' },
+              { id: 'DOC009', name: 'Dr. John Anderson', specialty: 'Pediatrics', email: 'john.anderson@smarthealthcare.com' },
+              { id: 'DOC010', name: 'Dr. Jennifer Lee', specialty: 'Orthopedics', email: 'jennifer.lee@smarthealthcare.com' },
+              { id: 'DOC011', name: 'Dr. William Brown', specialty: 'Orthopedics', email: 'william.brown@smarthealthcare.com' },
+              { id: 'DOC012', name: 'Dr. Susan Davis', specialty: 'Orthopedics', email: 'susan.davis@smarthealthcare.com' },
+              { id: 'DOC013', name: 'Dr. Mark Taylor', specialty: 'Dermatology', email: 'mark.taylor@smarthealthcare.com' },
+              { id: 'DOC014', name: 'Dr. Amanda White', specialty: 'Dermatology', email: 'amanda.white@smarthealthcare.com' },
+              { id: 'DOC015', name: 'Dr. Christopher Moore', specialty: 'Dermatology', email: 'christopher.moore@smarthealthcare.com' },
+              { id: 'DOC016', name: 'Dr. Patricia Clark', specialty: 'Internal Medicine', email: 'patricia.clark@smarthealthcare.com' },
+              { id: 'DOC017', name: 'Dr. Daniel Martinez', specialty: 'Internal Medicine', email: 'daniel.martinez@smarthealthcare.com' },
+              { id: 'DOC018', name: 'Dr. Rachel Green', specialty: 'Internal Medicine', email: 'rachel.green@smarthealthcare.com' }
+            ];
+            
+            currentDoctor = fallbackDoctors.find(doc => doc.id === doctorId || doc.email === doctorId);
+            if (currentDoctor) {
+              document.getElementById('doctorName').textContent = currentDoctor.name;
+              document.getElementById('doctorSpecialty').textContent = currentDoctor.specialty;
+              loadDoctorStatistics();
+            } else {
+              console.error('Doctor not found with ID:', doctorId);
+              document.getElementById('doctorName').textContent = 'Dr. Unknown';
+              document.getElementById('doctorSpecialty').textContent = 'Unknown Specialty';
+            }
+          }
+        })
+        .catch(error => {
+          console.error('Error loading doctor info:', error);
+          document.getElementById('doctorName').textContent = 'Dr. Unknown';
+          document.getElementById('doctorSpecialty').textContent = 'Unknown Specialty';
+        });
+    }
+    
+    // Load doctor statistics
+    function loadDoctorStatistics() {
+      allPrescriptions = JSON.parse(localStorage.getItem('userPrescriptions') || '[]');
+      
+      // Filter prescriptions for this doctor
+      const doctorPrescriptions = allPrescriptions.filter(prescription => 
+        prescription.doctorId === doctorId
+      );
+      
+      // Calculate statistics
+      const totalAppointments = doctorPrescriptions.length;
+      const pendingAppointments = doctorPrescriptions.filter(p => p.status === 'pending').length;
+      const completedPrescriptions = doctorPrescriptions.filter(p => p.status === 'viewed').length;
+      
+      // Update the statistics display
+      document.getElementById('totalAppointments').textContent = totalAppointments;
+      document.getElementById('pendingAppointments').textContent = pendingAppointments;
+      document.getElementById('completedPrescriptions').textContent = completedPrescriptions;
+    }
+    
+    // Add sample data if no appointments exist
+    function addSampleData() {
+      const existingPrescriptions = JSON.parse(localStorage.getItem('userPrescriptions') || '[]');
+      if (existingPrescriptions.length === 0) {
+        const samplePrescriptions = [
+          {
+            id: 'RX-001',
+            patientId: 'patient1@example.com',
+            doctorId: 'DOC005',
+            doctorName: 'Dr. James Wilson',
+            specialty: 'Neurology',
+            date: new Date().toISOString().split('T')[0],
+            time: '09:00',
+            symptoms: 'Patient reports severe headaches and dizziness for the past week. No previous neurological issues.',
+            status: 'pending',
+            medicines: [],
+            notes: ''
+          },
+          {
+            id: 'RX-002',
+            patientId: 'patient2@example.com',
+            doctorId: 'DOC005',
+            doctorName: 'Dr. James Wilson',
+            specialty: 'Neurology',
+            date: new Date().toISOString().split('T')[0],
+            time: '10:30',
+            symptoms: 'Memory issues and confusion. Family history of dementia.',
+            status: 'pending',
+            medicines: [],
+            notes: ''
+          },
+          {
+            id: 'RX-003',
+            patientId: 'patient3@example.com',
+            doctorId: 'DOC005',
+            doctorName: 'Dr. James Wilson',
+            specialty: 'Neurology',
+            date: new Date().toISOString().split('T')[0],
+            time: '14:00',
+            symptoms: 'Epileptic seizures increasing in frequency. Current medication not effective.',
+            status: 'pending',
+            medicines: [],
+            notes: ''
+          }
+        ];
+        localStorage.setItem('userPrescriptions', JSON.stringify(samplePrescriptions));
+      }
+    }
+    
+    // Initialize
+    addSampleData();
+    loadDoctorInfo();
+  </script>
+</body>
+</html>

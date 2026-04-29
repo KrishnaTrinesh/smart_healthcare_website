@@ -1,0 +1,66 @@
+{
+  "prescriptions": [
+    {
+      "id": "RX-10234",
+      "patientId": "user@example.com",
+      "doctorId": "DOC001",
+      "doctorName": "Dr. Sarah Johnson",
+      "specialty": "Cardiology",
+      "date": "2025-01-10",
+      "symptoms": "Chest pain, shortness of breath",
+      "status": "viewed",
+      "medicines": [
+        {
+          "name": "Aspirin 100mg",
+          "dosage": "1 tablet daily",
+          "duration": "30 days",
+          "instructions": "Take with food"
+        },
+        {
+          "name": "Metoprolol 50mg",
+          "dosage": "1 tablet twice daily",
+          "duration": "30 days",
+          "instructions": "Take at same time each day"
+        }
+      ],
+      "notes": "Follow up in 2 weeks. Avoid strenuous activities."
+    },
+    {
+      "id": "RX-10218",
+      "patientId": "user@example.com",
+      "doctorId": "DOC004",
+      "doctorName": "Dr. Emily Rodriguez",
+      "specialty": "Neurology",
+      "date": "2025-01-02",
+      "symptoms": "Headaches, dizziness",
+      "status": "pending",
+      "medicines": [],
+      "notes": "Doctor is reviewing your symptoms. Please wait for prescription."
+    },
+    {
+      "id": "RX-10190",
+      "patientId": "user@example.com",
+      "doctorId": "DOC007",
+      "doctorName": "Dr. Robert Kim",
+      "specialty": "Pediatrics",
+      "date": "2024-12-21",
+      "symptoms": "Fever, cough",
+      "status": "viewed",
+      "medicines": [
+        {
+          "name": "Paracetamol 500mg",
+          "dosage": "1 tablet every 6 hours",
+          "duration": "5 days",
+          "instructions": "Take with plenty of water"
+        },
+        {
+          "name": "Cough Syrup",
+          "dosage": "1 teaspoon 3 times daily",
+          "duration": "7 days",
+          "instructions": "Take after meals"
+        }
+      ],
+      "notes": "Rest well and drink plenty of fluids."
+    }
+  ]
+}

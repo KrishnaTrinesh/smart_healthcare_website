@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Patient Queue • Smart Healthcare</title>
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="nav">
+    <div class="container nav-inner">
+      <div class="brand"><div class="brand-mark"></div><span>Smart Healthcare</span></div>
+      <nav class="nav-links">
+        <a href="doctor-dashboard.html">Dashboard</a>
+        <a href="doctor-queue.html" aria-current="page">Patient Queue</a>
+        <a href="doctor-prescriptions.html">Prescriptions</a>
+        <a href="doctor-schedule.html">Schedule</a>
+        <a class="cta" href="login.html">Logout</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="section">
+    <div class="container">
+      <section class="card">
+        <h1 class="h1">Patient Queue</h1>
+        <p class="muted">Manage your patient appointments and prescriptions.</p>
+        
+
+        <!-- Patient Queue -->
+        <div>
+          <h2 class="h1" style="font-size: 22px;">Patient Queue</h2>
+          <p class="muted">Appointments ordered by time - click to view details and prescribe medicines.</p>
+          
+          <div id="patientQueue" style="margin-top: 16px;">
+            <!-- Patient appointments will be loaded here -->
+          </div>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <footer>
+    <div class="container">© <span id="year"></span> Smart Healthcare</div>
+  </footer>
+
+  <script>
+    document.getElementById('year').textContent = new Date().getFullYear();
+    
+    // Get doctor info from URL parameters or localStorage
+    const urlParams = new URLSearchParams(window.location.search);
+    let doctorId = urlParams.get('doctorId') || localStorage.getItem('currentDoctorId');
+    
+    // Force set a test doctor ID if none found
+    if (!doctorId) {
+      doctorId = 'DOC005'; // Dr. James Wilson
+    }
+    
+    console.log('Doctor ID from URL:', urlParams.get('doctorId'));
+    console.log('Doctor ID from localStorage:', localStorage.getItem('currentDoctorId'));
+    console.log('Final Doctor ID:', doctorId);
+    
+    let currentDoctor = null;
+    let allPrescriptions = [];
+    
+    // Load doctor information
+    function loadDoctorInfo() {
+      console.log('Loading doctor info for ID:', doctorId);
+      
+      if (!doctorId) {
+        console.error('No doctor ID found');
+        return;
+      }
+      
+      fetch('doctors.json')
+        .then(response => response.json())
+        .then(data => {
+          console.log('Doctors data loaded:', data);
+          
+          // Try to find doctor by ID first
+          currentDoctor = data.doctors.find(doc => doc.id === doctorId);
+          
+          // If not found by ID, try by email
+          if (!currentDoctor && doctorId && doctorId.includes('@')) {
+            currentDoctor = data.doctors.find(doc => doc.email === doctorId);
+            console.log('Searching for doctor with email:', doctorId);
+            console.log('Found doctor by email:', currentDoctor);
+          }
+          
+          console.log('Found doctor:', currentDoctor);
+          
+          if (currentDoctor) {
+            loadPatientQueue();
+          } else {
+            // Fallback to hardcoded data
+            const fallbackDoctors = [
+              { id: 'DOC001', name: 'Dr. Sarah Johnson', specialty: 'Cardiology' },
+              { id: 'DOC002', name: 'Dr. Michael Chen', specialty: 'Cardiology' },
+              { id: 'DOC003', name: 'Dr. David Smith', specialty: 'Cardiology' },
+              { id: 'DOC004', name: 'Dr. Emily Rodriguez', specialty: 'Neurology' },
+              { id: 'DOC005', name: 'Dr. James Wilson', specialty: 'Neurology' },
+              { id: 'DOC006', name: 'Dr. Lisa Thompson', specialty: 'Neurology' },
+              { id: 'DOC007', name: 'Dr. Robert Kim', specialty: 'Pediatrics' },
+              { id: 'DOC008', name: 'Dr. Maria Garcia', specialty: 'Pediatrics' },
+              { id: 'DOC009', name: 'Dr. John Anderson', specialty: 'Pediatrics' },
+              { id: 'DOC010', name: 'Dr. Jennifer Lee', specialty: 'Orthopedics' },
+              { id: 'DOC011', name: 'Dr. William Brown', specialty: 'Orthopedics' },
+              { id: 'DOC012', name: 'Dr. Susan Davis', specialty: 'Orthopedics' },
+              { id: 'DOC013', name: 'Dr. Mark Taylor', specialty: 'Dermatology' },
+              { id: 'DOC014', name: 'Dr. Amanda White', specialty: 'Dermatology' },
+              { id: 'DOC015', name: 'Dr. Christopher Moore', specialty: 'Dermatology' },
+              { id: 'DOC016', name: 'Dr. Patricia Clark', specialty: 'Internal Medicine' },
+              { id: 'DOC017', name: 'Dr. Daniel Martinez', specialty: 'Internal Medicine' },
+              { id: 'DOC018', name: 'Dr. Rachel Green', specialty: 'Internal Medicine' }
+            ];
+            
+            currentDoctor = fallbackDoctors.find(doc => doc.id === doctorId);
+            if (currentDoctor) {
+              loadPatientQueue();
+            } else {
+              console.error('Doctor not found with ID:', doctorId);
+            }
+          }
+        })
+        .catch(error => {
+          console.error('Error loading doctor info:', error);
+        });
+    }
+    
+    // Load patient queue ordered by time
+    function loadPatientQueue() {
+      allPrescriptions = JSON.parse(localStorage.getItem('userPrescriptions') || '[]');
+      
+      console.log('All prescriptions from localStorage:', allPrescriptions);
+      console.log('Filtering for doctorId:', doctorId);
+      
+      // Filter prescriptions for this doctor (by ID or email)
+      const doctorPrescriptions = allPrescriptions.filter(prescription => {
+        console.log('Checking prescription:', prescription.id, 'doctorId:', prescription.doctorId);
+        return prescription.doctorId === doctorId || prescription.doctorId === 'DOC005';
+      });
+      
+      console.log('Filtered prescriptions for this doctor:', doctorPrescriptions);
+      
+      // Sort by date and time
+      doctorPrescriptions.sort((a, b) => {
+        const dateA = new Date(a.date + ' ' + (a.time || '00:00'));
+        const dateB = new Date(b.date + ' ' + (b.time || '00:00'));
+        return dateA - dateB;
+      });
+      
+      const queueContainer = document.getElementById('patientQueue');
+      
+      if (doctorPrescriptions.length === 0) {
+        queueContainer.innerHTML = `
+          <div style="text-align: center; padding: 40px; background: rgba(245,158,11,0.1); border: 1px solid rgba(245,158,11,0.2); border-radius: 8px;">
+            <h3 style="color: #f59e0b; margin: 0;">No appointments scheduled</h3>
+            <p style="color: var(--muted); margin: 8px 0;">Patients will appear here when they book appointments with you.</p>
+          </div>
+        `;
+        return;
+      }
+      
+      queueContainer.innerHTML = '';
+      
+      doctorPrescriptions.forEach((prescription, index) => {
+        const appointmentCard = document.createElement('div');
+        appointmentCard.className = 'tile';
+        appointmentCard.style.cursor = 'pointer';
+        appointmentCard.style.marginBottom = '12px';
+        
+        // Determine status
+        let statusDisplay = '';
+        let statusColor = '';
+        if (prescription.status === 'viewed') {
+          statusDisplay = '✓ Prescription completed';
+          statusColor = 'color: #22c55e; font-weight: 600;';
+        } else if (prescription.status === 'pending') {
+          statusDisplay = '⏳ Waiting for doctor review';
+          statusColor = 'color: #f59e0b; font-weight: 600;';
+        }
+        
+        // Format time
+        const appointmentTime = prescription.time || '00:00';
+        const appointmentDateTime = new Date(prescription.date + ' ' + appointmentTime);
+        const timeString = appointmentDateTime.toLocaleString();
+        
+        appointmentCard.innerHTML = `
+          <div style="display: flex; justify-content: space-between; align-items: start;">
+            <div>
+              <h3 style="margin: 0 0 8px;">#${prescription.id}</h3>
+              <p class="muted" style="margin: 4px 0;">Patient: ${prescription.patientId}</p>
+              <p class="muted" style="margin: 4px 0;">Date: ${new Date(prescription.date).toLocaleDateString()}</p>
+              <p class="muted" style="margin: 4px 0;">Time: ${appointmentTime}</p>
+              <p style="margin: 8px 0; font-size: 14px; ${statusColor}">${statusDisplay}</p>
+            </div>
+            <div style="text-align: right;">
+              <div style="background: rgba(6,182,212,0.1); border: 1px solid rgba(6,182,212,0.2); border-radius: 6px; padding: 8px; margin-bottom: 8px;">
+                <div style="font-size: 12px; color: var(--muted);">Queue Position</div>
+                <div style="font-weight: 700; color: #06b6d4;">#${index + 1}</div>
+              </div>
+            </div>
+          </div>
+          <div style="margin-top: 12px;">
+            <button class="btn" onclick="viewPatientDetails('${prescription.id}')" style="margin-right: 8px;">
+              View Details
+            </button>
+            ${prescription.status === 'pending' ? 
+              `<button class="btn primary" onclick="prescribeMedicines('${prescription.id}')">
+                Prescribe Medicines
+              </button>` : 
+              `<button class="btn" onclick="viewPrescription('${prescription.id}')">
+                View Prescription
+              </button>`
+            }
+          </div>
+        `;
+        
+        queueContainer.appendChild(appointmentCard);
+      });
+    }
+    
+    // View patient details
+    function viewPatientDetails(prescriptionId) {
+      const prescription = allPrescriptions.find(p => p.id === prescriptionId);
+      if (!prescription) return;
+      
+      const modal = document.createElement('div');
+      modal.style.cssText = `
+        position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+        background: rgba(0,0,0,0.8); display: flex; align-items: center;
+        justify-content: center; z-index: 1000; padding: 20px;
+      `;
+      
+      modal.innerHTML = `
+        <div style="background: var(--card); border: 1px solid rgba(255,255,255,0.08); border-radius: 14px; padding: 24px; max-width: 600px; width: 100%; max-height: 80vh; overflow-y: auto;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+            <h2 style="margin: 0;">Patient Details - #${prescription.id}</h2>
+            <button onclick="this.closest('.modal').remove()" style="background: none; border: none; color: var(--muted); font-size: 24px; cursor: pointer;">×</button>
+          </div>
+          <p class="muted">Patient: ${prescription.patientId}</p>
+          <p class="muted">Date: ${new Date(prescription.date).toLocaleDateString()}</p>
+          <p class="muted">Time: ${prescription.time || 'Not specified'}</p>
+          <h4 style="margin:16px 0 8px;">Patient Symptoms & Details:</h4>
+          <div style="background: rgba(6,182,212,0.1); border: 1px solid rgba(6,182,212,0.2); border-radius: 8px; padding: 12px; margin: 8px 0;">
+            <p style="margin: 0;">${prescription.symptoms}</p>
+          </div>
+          ${prescription.medicines && prescription.medicines.length > 0 ? `
+            <h4 style="margin:16px 0 8px; color: #22c55e;">Prescribed Medicines:</h4>
+            ${prescription.medicines.map(medicine => `
+              <div style="background: rgba(34,197,94,0.1); border: 1px solid rgba(34,197,94,0.2); border-radius: 8px; padding: 12px; margin: 8px 0;">
+                <strong>${medicine.name}</strong><br>
+                <span style="color: var(--muted);">Dosage: ${medicine.dosage}</span><br>
+                <span style="color: var(--muted);">Duration: ${medicine.duration}</span><br>
+                <span style="color: var(--muted);">Instructions: ${medicine.instructions}</span>
+              </div>
+            `).join('')}
+          ` : ''}
+          ${prescription.notes ? `<h4 style="margin:16px 0 8px;">Doctor's Notes:</h4><p>${prescription.notes}</p>` : ''}
+        </div>
+      `;
+      
+      modal.className = 'modal';
+      document.body.appendChild(modal);
+    }
+    
+    // Prescribe medicines
+    function prescribeMedicines(prescriptionId) {
+      const prescription = allPrescriptions.find(p => p.id === prescriptionId);
+      if (!prescription) return;
+      
+      const modal = document.createElement('div');
+      modal.style.cssText = `
+        position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+        background: rgba(0,0,0,0.8); display: flex; align-items: center;
+        justify-content: center; z-index: 1000; padding: 20px;
+      `;
+      
+      modal.innerHTML = `
+        <div style="background: var(--card); border: 1px solid rgba(255,255,255,0.08); border-radius: 14px; padding: 24px; max-width: 700px; width: 100%; max-height: 80vh; overflow-y: auto;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+            <h2 style="margin: 0;">Prescribe Medicines - #${prescription.id}</h2>
+            <button onclick="this.closest('.modal').remove()" style="background: none; border: none; color: var(--muted); font-size: 24px; cursor: pointer;">×</button>
+          </div>
+          
+          <div style="margin-bottom: 16px;">
+            <h4 style="margin: 0 0 8px;">Patient Symptoms:</h4>
+            <div style="background: rgba(6,182,212,0.1); border: 1px solid rgba(6,182,212,0.2); border-radius: 8px; padding: 12px;">
+              <p style="margin: 0;">${prescription.symptoms}</p>
+            </div>
+          </div>
+          
+          <form id="prescriptionForm">
+            <div id="medicinesContainer">
+              <div class="medicine-entry" style="background: rgba(34,197,94,0.1); border: 1px solid rgba(34,197,94,0.2); border-radius: 8px; padding: 16px; margin-bottom: 16px;">
+                <h4 style="margin: 0 0 12px; color: #22c55e;">Medicine 1</h4>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px;">
+                  <div>
+                    <label style="display: block; margin-bottom: 4px; font-weight: 600;">Medicine Name</label>
+                    <input type="text" name="medicineName" placeholder="e.g., Paracetamol" required style="width: 100%; padding: 8px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.08); background: rgba(15, 22, 40, 0.8); color: var(--text);">
+                  </div>
+                  <div>
+                    <label style="display: block; margin-bottom: 4px; font-weight: 600;">Dosage</label>
+                    <input type="text" name="dosage" placeholder="e.g., 500mg twice daily" required style="width: 100%; padding: 8px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.08); background: rgba(15, 22, 40, 0.8); color: var(--text);">
+                  </div>
+                </div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px;">
+                  <div>
+                    <label style="display: block; margin-bottom: 4px; font-weight: 600;">Duration</label>
+                    <input type="text" name="duration" placeholder="e.g., 7 days" required style="width: 100%; padding: 8px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.08); background: rgba(15, 22, 40, 0.8); color: var(--text);">
+                  </div>
+                  <div>
+                    <label style="display: block; margin-bottom: 4px; font-weight: 600;">Instructions</label>
+                    <input type="text" name="instructions" placeholder="e.g., Take with food" required style="width: 100%; padding: 8px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.08); background: rgba(15, 22, 40, 0.8); color: var(--text);">
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <div style="margin-bottom: 16px;">
+              <button type="button" onclick="addMedicine()" style="background: rgba(6,182,212,0.1); border: 1px solid rgba(6,182,212,0.2); color: #06b6d4; padding: 8px 16px; border-radius: 6px; cursor: pointer; margin-right: 8px;">
+                + Add Another Medicine
+              </button>
+            </div>
+            
+            <div style="margin-bottom: 16px;">
+              <label style="display: block; margin-bottom: 8px; font-weight: 600;">Doctor's Notes (Optional)</label>
+              <textarea name="notes" placeholder="Additional notes for the patient..." rows="3" style="width: 100%; padding: 8px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.08); background: rgba(15, 22, 40, 0.8); color: var(--text); resize: vertical;"></textarea>
+            </div>
+            
+            <div style="display: flex; gap: 12px;">
+              <button type="submit" class="btn primary" style="flex: 1;">Prescribe Medicines</button>
+              <button type="button" onclick="this.closest('.modal').remove()" class="btn" style="flex: 1;">Cancel</button>
+            </div>
+          </form>
+        </div>
+      `;
+      
+      modal.className = 'modal';
+      document.body.appendChild(modal);
+      
+      // Handle form submission
+      document.getElementById('prescriptionForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const formData = new FormData(this);
+        const medicines = [];
+        const medicineEntries = document.querySelectorAll('.medicine-entry');
+        
+        medicineEntries.forEach(entry => {
+          const name = entry.querySelector('input[name="medicineName"]').value;
+          const dosage = entry.querySelector('input[name="dosage"]').value;
+          const duration = entry.querySelector('input[name="duration"]').value;
+          const instructions = entry.querySelector('input[name="instructions"]').value;
+          
+          if (name && dosage && duration && instructions) {
+            medicines.push({ name, dosage, duration, instructions });
+          }
+        });
+        
+        if (medicines.length === 0) {
+          alert('Please add at least one medicine');
+          return;
+        }
+        
+        // Update prescription
+        const prescriptionIndex = allPrescriptions.findIndex(p => p.id === prescriptionId);
+        if (prescriptionIndex !== -1) {
+          allPrescriptions[prescriptionIndex].medicines = medicines;
+          allPrescriptions[prescriptionIndex].status = 'viewed';
+          allPrescriptions[prescriptionIndex].notes = formData.get('notes') || '';
+          
+          // Save to localStorage
+          localStorage.setItem('userPrescriptions', JSON.stringify(allPrescriptions));
+          
+          alert('Prescription completed successfully!');
+          modal.remove();
+          loadPatientQueue(); // Refresh the queue
+        }
+      });
+    }
+    
+    // Add medicine entry
+    function addMedicine() {
+      const container = document.getElementById('medicinesContainer');
+      const medicineCount = container.children.length + 1;
+      
+      const medicineEntry = document.createElement('div');
+      medicineEntry.className = 'medicine-entry';
+      medicineEntry.style.cssText = 'background: rgba(34,197,94,0.1); border: 1px solid rgba(34,197,94,0.2); border-radius: 8px; padding: 16px; margin-bottom: 16px;';
+      
+      medicineEntry.innerHTML = `
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+          <h4 style="margin: 0; color: #22c55e;">Medicine ${medicineCount}</h4>
+          <button type="button" onclick="removeMedicine(this)" style="background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.2); color: #ef4444; padding: 4px 8px; border-radius: 4px; cursor: pointer; font-size: 12px;">
+            Remove
+          </button>
+        </div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px;">
+          <div>
+            <label style="display: block; margin-bottom: 4px; font-weight: 600;">Medicine Name</label>
+            <input type="text" name="medicineName" placeholder="e.g., Paracetamol" required style="width: 100%; padding: 8px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.08); background: rgba(15, 22, 40, 0.8); color: var(--text);">
+          </div>
+          <div>
+            <label style="display: block; margin-bottom: 4px; font-weight: 600;">Dosage</label>
+            <input type="text" name="dosage" placeholder="e.g., 500mg twice daily" required style="width: 100%; padding: 8px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.08); background: rgba(15, 22, 40, 0.8); color: var(--text);">
+          </div>
+        </div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+          <div>
+            <label style="display: block; margin-bottom: 4px; font-weight: 600;">Duration</label>
+            <input type="text" name="duration" placeholder="e.g., 7 days" required style="width: 100%; padding: 8px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.08); background: rgba(15, 22, 40, 0.8); color: var(--text);">
+          </div>
+          <div>
+            <label style="display: block; margin-bottom: 4px; font-weight: 600;">Instructions</label>
+            <input type="text" name="instructions" placeholder="e.g., Take with food" required style="width: 100%; padding: 8px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.08); background: rgba(15, 22, 40, 0.8); color: var(--text);">
+          </div>
+        </div>
+      `;
+      
+      container.appendChild(medicineEntry);
+    }
+    
+    // Remove medicine entry
+    function removeMedicine(button) {
+      button.closest('.medicine-entry').remove();
+    }
+    
+    // View prescription
+    function viewPrescription(prescriptionId) {
+      const prescription = allPrescriptions.find(p => p.id === prescriptionId);
+      if (!prescription) return;
+      
+      viewPatientDetails(prescriptionId);
+    }
+    
+    // Add sample data if no appointments exist
+    function addSampleData() {
+      const existingPrescriptions = JSON.parse(localStorage.getItem('userPrescriptions') || '[]');
+      if (existingPrescriptions.length === 0) {
+        const samplePrescriptions = [
+          {
+            id: 'RX-001',
+            patientId: 'patient1@example.com',
+            doctorId: 'DOC005',
+            doctorName: 'Dr. James Wilson',
+            specialty: 'Neurology',
+            date: new Date().toISOString().split('T')[0],
+            time: '09:00',
+            symptoms: 'Patient reports severe headaches and dizziness for the past week. No previous neurological issues.',
+            status: 'pending',
+            medicines: [],
+            notes: ''
+          },
+          {
+            id: 'RX-002',
+            patientId: 'patient2@example.com',
+            doctorId: 'DOC005',
+            doctorName: 'Dr. James Wilson',
+            specialty: 'Neurology',
+            date: new Date().toISOString().split('T')[0],
+            time: '10:30',
+            symptoms: 'Memory issues and confusion. Family history of dementia.',
+            status: 'pending',
+            medicines: [],
+            notes: ''
+          },
+          {
+            id: 'RX-003',
+            patientId: 'patient3@example.com',
+            doctorId: 'DOC005',
+            doctorName: 'Dr. James Wilson',
+            specialty: 'Neurology',
+            date: new Date().toISOString().split('T')[0],
+            time: '14:00',
+            symptoms: 'Epileptic seizures increasing in frequency. Current medication not effective.',
+            status: 'pending',
+            medicines: [],
+            notes: ''
+          }
+        ];
+        localStorage.setItem('userPrescriptions', JSON.stringify(samplePrescriptions));
+      }
+    }
+    
+    // Initialize
+    addSampleData();
+    loadDoctorInfo();
+  </script>
+</body>
+</html>

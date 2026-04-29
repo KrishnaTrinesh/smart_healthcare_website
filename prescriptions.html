@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Prescriptions • Smart Healthcare</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="nav">
+    <div class="container nav-inner">
+      <div class="brand"><div class="brand-mark"></div><span>Smart Healthcare</span></div>
+      <nav class="nav-links">
+        <a href="index.html">Home</a>
+        <a href="booking.html">Booking</a>
+        <a href="queue.html">Queue</a>
+        <a href="prescriptions.html" aria-current="page">Prescriptions</a>
+        <a href="doctors.html">Doctors</a>
+        <a class="cta" href="user-login.html">Login</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="section">
+    <div class="container">
+      <section class="card">
+        <h1 class="h1">My Prescriptions</h1>
+        <p class="muted">View and manage your electronic prescriptions.</p>
+        <div class="grid grid-3" id="prescriptionsGrid" style="margin-top:12px">
+          <!-- Prescriptions will be loaded dynamically -->
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <footer>
+    <div class="container">© <span id="year"></span> Smart Healthcare</div>
+  </footer>
+
+  <script>
+    document.getElementById('year').textContent = new Date().getFullYear();
+
+    const prescriptionsGrid = document.getElementById('prescriptionsGrid');
+    prescriptionsGrid.innerHTML = '';
+
+    async function loadMyPrescriptions() {
+      const token = localStorage.getItem('smartHealthcareToken');
+      if (!token) {
+        prescriptionsGrid.innerHTML = `
+          <div style="grid-column: 1 / -1; text-align: center; padding: 40px;">
+            <h3 style="color: var(--muted); margin: 0;">You're not logged in</h3>
+            <p style="color: var(--muted); margin: 8px 0;">Please login to view your prescriptions.</p>
+            <a href="user-login.html" class="btn primary" style="margin-top: 16px;">Go to Login</a>
+          </div>
+        `;
+        return;
+      }
+
+      try {
+        const resp = await fetch('/api/booking/my-appointments', {
+          method: 'GET',
+          headers: {
+            'Accept': 'application/json',
+            'Authorization': `Bearer ${token}`
+          }
+        });
+
+        if (!resp.ok) {
+          throw new Error(await resp.text());
+        }
+
+        const data = await resp.json();
+        const appointments = data.appointments || [];
+
+        if (appointments.length === 0) {
+          prescriptionsGrid.innerHTML = `
+            <div style="grid-column: 1 / -1; text-align: center; padding: 40px;">
+              <h3 style="color: var(--muted); margin: 0;">No prescriptions yet</h3>
+              <p style="color: var(--muted); margin: 8px 0;">Book an appointment to see it here once the doctor responds.</p>
+              <a href="booking.html" class="btn primary" style="margin-top: 16px;">Book Appointment</a>
+            </div>
+          `;
+          return;
+        }
+
+        appointments.forEach(appt => {
+          const card = document.createElement('div');
+          card.className = 'tile';
+
+          // Determine status
+          let statusDisplay = '';
+          let statusColor = '';
+          const hasMeds = Array.isArray(appt.medicines) ? appt.medicines.length > 0 : (!!appt.medicines && appt.medicines !== '[]');
+          if (hasMeds) {
+            statusDisplay = '✓ Doctor has prescribed medicines';
+            statusColor = 'color: #22c55e; font-weight: 600;';
+          } else {
+            statusDisplay = '⏳ Doctor is busy - Not viewed yet';
+            statusColor = 'color: #f59e0b; font-weight: 600;';
+          }
+
+          const doctorName = appt.doctor_name || appt.doctor_name || ''; // backend provides doctor_name in to_dict
+          card.innerHTML = `
+            <h3 style="margin:0">#${appt.prescription_id}</h3>
+            <p class="muted">${doctorName} • ${appt.specialty || ''}</p>
+            <p class="muted">${new Date(appt.appointment_date).toLocaleDateString()}</p>
+            <p style="margin:8px 0; font-size:14px; ${statusColor}">${statusDisplay}</p>
+            <button class="btn" style="margin-top:10px">View Details</button>
+          `;
+
+          card.querySelector('button').addEventListener('click', () => showPrescriptionModal(appt));
+          prescriptionsGrid.appendChild(card);
+        });
+      } catch (err) {
+        console.error('Error loading prescriptions:', err);
+        prescriptionsGrid.innerHTML = `
+          <div style="grid-column: 1 / -1; text-align: center; padding: 40px;">
+            <h3 style="color: var(--danger); margin: 0;">Failed to load prescriptions</h3>
+            <p style="color: var(--muted); margin: 8px 0;">${(err && err.message) || 'Please try again later.'}</p>
+          </div>
+        `;
+      }
+    }
+
+    function showPrescriptionModal(appt) {
+      let medicines = [];
+      try {
+        medicines = Array.isArray(appt.medicines) ? appt.medicines : (appt.medicines ? JSON.parse(appt.medicines) : []);
+      } catch (_) {
+        medicines = [];
+      }
+
+      let medicinesHtml = '';
+      if (medicines.length > 0) {
+        medicinesHtml = `
+          <h4 style="margin:16px 0 8px; color: #22c55e;">Prescribed Medicines:</h4>
+          ${medicines.map(medicine => `
+            <div style="background: rgba(34,197,94,0.1); border: 1px solid rgba(34,197,94,0.2); border-radius: 8px; padding: 12px; margin: 8px 0;">
+              <strong>${medicine.name || medicine.drug || ''}</strong><br>
+              ${medicine.dosage ? `<span style=\"color: var(--muted);\">Dosage: ${medicine.dosage}</span><br>` : ''}
+              ${medicine.duration ? `<span style=\"color: var(--muted);\">Duration: ${medicine.duration}</span><br>` : ''}
+              ${medicine.instructions ? `<span style=\"color: var(--muted);\">Instructions: ${medicine.instructions}</span>` : ''}
+            </div>
+          `).join('')}
+        `;
+      } else {
+        medicinesHtml = `
+          <div style="background: rgba(245,158,11,0.1); border: 1px solid rgba(245,158,11,0.2); border-radius: 8px; padding: 12px; margin: 16px 0;">
+            <p style="color: #f59e0b; margin: 0; font-weight: 600;">⏳ Doctor hasn't viewed your prescription yet. The doctor is busy.</p>
+          </div>
+        `;
+      }
+
+      const modal = document.createElement('div');
+      modal.style.cssText = `
+        position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+        background: rgba(0,0,0,0.8); display: flex; align-items: center;
+        justify-content: center; z-index: 1000; padding: 20px;
+      `;
+
+      const doctorName = appt.doctor_name || '';
+      modal.innerHTML = `
+        <div style="background: var(--card); border: 1px solid rgba(255,255,255,0.08); border-radius: 14px; padding: 24px; max-width: 600px; width: 100%; max-height: 80vh; overflow-y: auto;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+            <h2 style="margin: 0;">Prescription #${appt.prescription_id}</h2>
+            <button onclick="this.closest('.modal').remove()" style="background: none; border: none; color: var(--muted); font-size: 24px; cursor: pointer;">×</button>
+          </div>
+          <p class="muted">Doctor: ${doctorName}</p>
+          <p class="muted">Date: ${new Date(appt.appointment_date).toLocaleDateString()}</p>
+          <h4 style="margin:16px 0 8px;">Your Submitted Symptoms:</h4>
+          <div style="background: rgba(6,182,212,0.1); border: 1px solid rgba(6,182,212,0.2); border-radius: 8px; padding: 12px; margin: 8px 0;">
+            <p style="margin: 0;">${appt.symptoms || ''}</p>
+          </div>
+          ${medicinesHtml}
+          ${appt.notes ? `<h4 style=\"margin:16px 0 8px;\">Doctor's Notes:</h4><p>${appt.notes}</p>` : ''}
+        </div>
+      `;
+
+      modal.className = 'modal';
+      document.body.appendChild(modal);
+    }
+
+    loadMyPrescriptions();
+  </script>
+</body>
+</html>

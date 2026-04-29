@@ -1,0 +1,202 @@
+{
+  "doctors": [
+    {
+      "id": "DOC001",
+      "name": "Dr. Sarah Johnson",
+      "specialty": "Cardiology",
+      "email": "sarah.johnson@smarthealthcare.com",
+      "phone": "+1-555-0101",
+      "experience": "15 years",
+      "rating": 4.8,
+      "availability": "Mon-Fri 9AM-5PM",
+      "password": "doc123"
+    },
+    {
+      "id": "DOC002",
+      "name": "Dr. Michael Chen",
+      "specialty": "Cardiology",
+      "email": "michael.chen@smarthealthcare.com",
+      "phone": "+1-555-0102",
+      "experience": "12 years",
+      "rating": 4.9,
+      "availability": "Mon-Wed-Fri 8AM-4PM",
+      "password": "doc123"
+    },
+    {
+      "id": "DOC003",
+      "name": "Dr. David Smith",
+      "specialty": "Cardiology",
+      "email": "david.smith@smarthealthcare.com",
+      "phone": "+1-555-0103",
+      "experience": "18 years",
+      "rating": 4.7,
+      "availability": "Tue-Thu 10AM-6PM",
+      "password": "doc123"
+    },
+    {
+      "id": "DOC004",
+      "name": "Dr. Emily Rodriguez",
+      "specialty": "Neurology",
+      "email": "emily.rodriguez@smarthealthcare.com", 
+      "phone": "+1-555-0104",
+      "experience": "10 years",
+      "rating": 4.7,
+      "availability": "Tue-Thu-Sat 10AM-6PM",
+      "password": "doc123"
+    },
+    {
+      "id": "DOC005",
+      "name": "Dr. James Wilson",
+      "specialty": "Neurology",
+      "email": "james.wilson@smarthealthcare.com",
+      "phone": "+1-555-0105", 
+      "experience": "18 years",
+      "rating": 4.9,
+      "availability": "Mon-Fri 7AM-3PM",
+      "password": "doc123"
+    },
+    {
+      "id": "DOC006",
+      "name": "Dr. Lisa Thompson",
+      "specialty": "Neurology",
+      "email": "lisa.thompson@smarthealthcare.com",
+      "phone": "+1-555-0106",
+      "experience": "8 years", 
+      "rating": 4.6,
+      "availability": "Wed-Fri 9AM-5PM",
+      "password": "doc123"
+    },
+    {
+      "id": "DOC007",
+      "name": "Dr. Robert Kim",
+      "specialty": "Pediatrics",
+      "email": "robert.kim@smarthealthcare.com",
+      "phone": "+1-555-0107",
+      "experience": "20 years",
+      "rating": 4.9,
+      "availability": "Mon-Thu 8AM-4PM",
+      "password": "doc123"
+    },
+    {
+      "id": "DOC008",
+      "name": "Dr. Maria Garcia",
+      "specialty": "Pediatrics",
+      "email": "maria.garcia@smarthealthcare.com",
+      "phone": "+1-555-0108",
+      "experience": "14 years",
+      "rating": 4.8,
+      "availability": "Mon-Wed-Fri 9AM-5PM",
+      "password": "doc123"
+    },
+    {
+      "id": "DOC009",
+      "name": "Dr. John Anderson",
+      "specialty": "Pediatrics",
+      "email": "john.anderson@smarthealthcare.com",
+      "phone": "+1-555-0109",
+      "experience": "16 years",
+      "rating": 4.7,
+      "availability": "Tue-Thu-Sat 8AM-4PM",
+      "password": "doc123"
+    },
+    {
+      "id": "DOC010",
+      "name": "Dr. Jennifer Lee",
+      "specialty": "Orthopedics",
+      "email": "jennifer.lee@smarthealthcare.com",
+      "phone": "+1-555-0110",
+      "experience": "13 years",
+      "rating": 4.8,
+      "availability": "Mon-Fri 8AM-4PM",
+      "password": "doc123"
+    },
+    {
+      "id": "DOC011",
+      "name": "Dr. William Brown",
+      "specialty": "Orthopedics",
+      "email": "william.brown@smarthealthcare.com",
+      "phone": "+1-555-0111",
+      "experience": "22 years",
+      "rating": 4.9,
+      "availability": "Mon-Wed-Fri 7AM-3PM",
+      "password": "doc123"
+    },
+    {
+      "id": "DOC012",
+      "name": "Dr. Susan Davis",
+      "specialty": "Orthopedics",
+      "email": "susan.davis@smarthealthcare.com",
+      "phone": "+1-555-0112",
+      "experience": "11 years",
+      "rating": 4.6,
+      "availability": "Tue-Thu 9AM-5PM",
+      "password": "doc123"
+    },
+    {
+      "id": "DOC013",
+      "name": "Dr. Mark Taylor",
+      "specialty": "Dermatology",
+      "email": "mark.taylor@smarthealthcare.com",
+      "phone": "+1-555-0113",
+      "experience": "9 years",
+      "rating": 4.7,
+      "availability": "Mon-Wed-Fri 10AM-6PM",
+      "password": "doc123"
+    },
+    {
+      "id": "DOC014",
+      "name": "Dr. Amanda White",
+      "specialty": "Dermatology",
+      "email": "amanda.white@smarthealthcare.com",
+      "phone": "+1-555-0114",
+      "experience": "7 years",
+      "rating": 4.5,
+      "availability": "Tue-Thu-Sat 9AM-5PM",
+      "password": "doc123"
+    },
+    {
+      "id": "DOC015",
+      "name": "Dr. Christopher Moore",
+      "specialty": "Dermatology",
+      "email": "christopher.moore@smarthealthcare.com",
+      "phone": "+1-555-0115",
+      "experience": "12 years",
+      "rating": 4.8,
+      "availability": "Mon-Fri 8AM-4PM",
+      "password": "doc123"
+    },
+    {
+      "id": "DOC016",
+      "name": "Dr. Patricia Clark",
+      "specialty": "Internal Medicine",
+      "email": "patricia.clark@smarthealthcare.com",
+      "phone": "+1-555-0116",
+      "experience": "19 years",
+      "rating": 4.9,
+      "availability": "Mon-Thu 8AM-4PM",
+      "password": "doc123"
+    },
+    {
+      "id": "DOC017",
+      "name": "Dr. Daniel Martinez",
+      "specialty": "Internal Medicine",
+      "email": "daniel.martinez@smarthealthcare.com",
+      "phone": "+1-555-0117",
+      "experience": "15 years",
+      "rating": 4.7,
+      "availability": "Mon-Wed-Fri 9AM-5PM",
+      "password": "doc123"
+    },
+    {
+      "id": "DOC018",
+      "name": "Dr. Rachel Green",
+      "specialty": "Internal Medicine",
+      "email": "rachel.green@smarthealthcare.com",
+      "phone": "+1-555-0118",
+      "experience": "17 years",
+      "rating": 4.8,
+      "availability": "Tue-Thu-Sat 8AM-4PM",
+      "password": "doc123"
+    }
+  ]
+}

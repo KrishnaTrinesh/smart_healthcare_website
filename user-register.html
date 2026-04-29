@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>User Registration • Smart Healthcare</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #0f172a;
+      --card: #111827;
+      --muted: #94a3b8;
+      --text: #e5e7eb;
+      --brand: #22c55e;
+      --brand-2: #06b6d4;
+      --accent: #a78bfa;
+      --danger: #ef4444;
+      --warning: #f59e0b;
+      --surface: #0b1220;
+      --ring: rgba(34, 197, 94, 0.35);
+      --shadow: 0 10px 25px rgba(0,0,0,.35);
+      --radius: 14px;
+    }
+    * { box-sizing: border-box; }
+    html, body { height: 100%; }
+    body {
+      margin: 0;
+      font-family: "Inter", system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", sans-serif;
+      color: var(--text);
+      background: radial-gradient(1200px 600px at 20% -10%, rgba(6, 182, 212, 0.2), transparent 60%),
+                  radial-gradient(1000px 500px at 80% 10%, rgba(167, 139, 250, 0.18), transparent 60%),
+                  linear-gradient(180deg, #0b1020 0%, #0a0f1b 100%);
+      min-height: 100%;
+      display: flex;
+      flex-direction: column;
+    }
+    a { color: inherit; text-decoration: none; }
+    .container { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
+
+    /* Navbar */
+    .nav {
+      position: sticky; top: 0; z-index: 50;
+      background: rgba(11, 16, 32, 0.7);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+    }
+    .nav-inner {
+      display: flex; align-items: center; justify-content: space-between;
+      height: 64px;
+    }
+    .brand {
+      display: flex; align-items: center; gap: 10px; font-weight: 700;
+      letter-spacing: 0.2px;
+    }
+    .brand-mark {
+      width: 34px; height: 34px; border-radius: 10px;
+      background: conic-gradient(from 180deg at 50% 50%, var(--brand), var(--brand-2), var(--accent), var(--brand));
+      box-shadow: 0 0 0 3px rgba(34,197,94,0.15), 0 8px 20px rgba(6,182,212,0.25);
+    }
+    .nav-links { display: flex; align-items: center; gap: 14px; }
+    .nav-links a {
+      padding: 8px 12px; border-radius: 10px; color: var(--muted);
+      border: 1px solid transparent;
+    }
+    .nav-links a:hover {
+      color: var(--text); border-color: rgba(255,255,255,0.08);
+      background: rgba(255,255,255,0.03);
+    }
+    .cta {
+      background: linear-gradient(135deg, var(--brand), var(--brand-2));
+      color: #051016; padding: 8px 14px; border-radius: 10px; font-weight: 700;
+      box-shadow: 0 6px 20px rgba(34,197,94,0.35);
+      border: 1px solid rgba(255,255,255,0.12);
+    }
+    .cta:hover { filter: brightness(1.05); }
+
+    /* Registration Form */
+    .register-container {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 40px 0;
+    }
+    .register-card {
+      background: radial-gradient(600px 200px at 10% 0%, rgba(6,182,212,0.15), transparent 50%),
+                  linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.00));
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: var(--radius);
+      padding: 40px;
+      box-shadow: var(--shadow);
+      width: 100%;
+      max-width: 480px;
+    }
+    .register-header {
+      text-align: center;
+      margin-bottom: 32px;
+    }
+    .register-icon {
+      width: 60px; height: 60px; border-radius: 16px;
+      background: linear-gradient(135deg, var(--brand), var(--brand-2));
+      display: flex; align-items: center; justify-content: center;
+      margin: 0 auto 16px;
+      box-shadow: 0 8px 25px rgba(34,197,94,0.3);
+    }
+    .register-icon::before {
+      content: "📝";
+      font-size: 24px;
+    }
+    .register-title {
+      font-size: 28px; font-weight: 700; margin: 0 0 8px;
+      background: linear-gradient(135deg, #fff, #d5fbe3 35%, #b6f3ff 70%, #e6deff);
+      -webkit-background-clip: text; background-clip: text; color: transparent;
+    }
+    .register-subtitle {
+      color: var(--muted); margin: 0; font-size: 16px;
+    }
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+    .form-group {
+      margin-bottom: 20px;
+    }
+    .form-group.full-width {
+      grid-column: 1 / -1;
+    }
+    .form-label {
+      display: block; margin-bottom: 8px; color: var(--muted);
+      font-weight: 600; font-size: 14px;
+    }
+    .form-input {
+      width: 100%; padding: 12px 16px; border-radius: 10px;
+      background: rgba(15, 22, 40, 0.8); color: var(--text);
+      border: 1px solid rgba(255,255,255,0.08);
+      font-size: 16px; transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+    .form-input:focus {
+      outline: none; border-color: var(--brand);
+      box-shadow: 0 0 0 3px rgba(34,197,94,0.15);
+    }
+    .form-input::placeholder {
+      color: var(--muted);
+    }
+    .register-button {
+      width: 100%; padding: 14px; border-radius: 10px;
+      background: linear-gradient(135deg, var(--brand), var(--brand-2));
+      color: #051016; font-weight: 700; font-size: 16px;
+      border: none; cursor: pointer; transition: filter 0.2s ease;
+      box-shadow: 0 6px 20px rgba(34,197,94,0.35);
+    }
+    .register-button:hover {
+      filter: brightness(1.05);
+    }
+    .register-button:active {
+      transform: translateY(1px);
+    }
+    .register-footer {
+      text-align: center; margin-top: 24px; color: var(--muted);
+    }
+    .register-footer a {
+      color: var(--brand); font-weight: 600;
+    }
+    .register-footer a:hover {
+      text-decoration: underline;
+    }
+    .login-link {
+      margin-top: 16px; padding-top: 16px;
+      border-top: 1px solid rgba(255,255,255,0.08);
+    }
+
+    /* Footer */
+    footer {
+      margin-top: auto; padding: 20px 0; color: var(--muted); font-size: 14px;
+      border-top: 1px solid rgba(255,255,255,0.06);
+    }
+
+    /* Responsive */
+    @media (max-width: 640px) {
+      .register-card {
+        margin: 0 20px; padding: 32px 24px;
+      }
+      .form-row {
+        grid-template-columns: 1fr;
+      }
+      .nav-inner { height: auto; padding: 12px 0; gap: 12px; flex-wrap: wrap; }
+      .nav-links { width: 100%; flex-wrap: wrap; gap: 8px; }
+    }
+  </style>
+</head>
+<body>
+  <header class="nav">
+    <div class="container nav-inner" role="navigation" aria-label="Primary">
+      <div class="brand">
+        <div class="brand-mark" aria-hidden="true"></div>
+        <span>Smart Healthcare</span>
+      </div>
+      <nav class="nav-links">
+        <a href="index.html">Home</a>
+        <a href="booking.html">Booking</a>
+        <a href="queue.html">Queue</a>
+        <a href="prescriptions.html">Prescriptions</a>
+        <a href="doctors.html">Doctors</a>
+        <a href="user-login.html">User Login</a>
+        <a href="doctor-login.html">Doctor Login</a>
+        <a class="cta" href="admin-login.html">Admin</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="register-container">
+    <div class="register-card">
+      <div class="register-header">
+        <div class="register-icon" aria-hidden="true"></div>
+        <h1 class="register-title">Create Account</h1>
+        <p class="register-subtitle">Join Smart Healthcare to manage your appointments</p>
+      </div>
+      
+      <form id="userRegisterForm">
+        <div class="form-row">
+          <div class="form-group">
+            <label for="firstName" class="form-label">First Name</label>
+            <input 
+              type="text" 
+              id="firstName" 
+              name="firstName" 
+              class="form-input" 
+              placeholder="Enter your first name"
+              required
+            />
+          </div>
+          
+          <div class="form-group">
+            <label for="lastName" class="form-label">Last Name</label>
+            <input 
+              type="text" 
+              id="lastName" 
+              name="lastName" 
+              class="form-input" 
+              placeholder="Enter your last name"
+              required
+            />
+          </div>
+        </div>
+        
+        <div class="form-group">
+          <label for="email" class="form-label">Email Address</label>
+          <input 
+            type="email" 
+            id="email" 
+            name="email" 
+            class="form-input" 
+            placeholder="Enter your email address"
+            required
+          />
+        </div>
+        
+        <div class="form-group">
+          <label for="phone" class="form-label">Phone Number</label>
+          <input 
+            type="tel" 
+            id="phone" 
+            name="phone" 
+            class="form-input" 
+            placeholder="Enter your phone number"
+            required
+          />
+        </div>
+        
+        <div class="form-row">
+          <div class="form-group">
+            <label for="password" class="form-label">Password</label>
+            <input 
+              type="password" 
+              id="password" 
+              name="password" 
+              class="form-input" 
+              placeholder="Create a password"
+              required
+            />
+          </div>
+          
+          <div class="form-group">
+            <label for="confirmPassword" class="form-label">Confirm Password</label>
+            <input 
+              type="password" 
+              id="confirmPassword" 
+              name="confirmPassword" 
+              class="form-input" 
+              placeholder="Confirm your password"
+              required
+            />
+          </div>
+        </div>
+        
+        <button type="submit" class="register-button">
+          Create Account
+        </button>
+      </form>
+      
+      <div class="register-footer">
+        <div class="login-link">
+          <p>Already have an account? <a href="user-login.html">Sign in here</a></p>
+        </div>
+        <p>Need help? <a href="mailto:support@smarthealthcare.com">Contact Support</a></p>
+      </div>
+    </div>
+  </main>
+
+  <footer>
+    <div class="container">
+      © <span id="year"></span> Smart Healthcare. All rights reserved.
+    </div>
+  </footer>
+
+  <script>
+    document.getElementById('year').textContent = new Date().getFullYear();
+    
+    document.getElementById('userRegisterForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      
+      const firstName = document.getElementById('firstName').value;
+      const lastName = document.getElementById('lastName').value;
+      const email = document.getElementById('email').value;
+      const phone = document.getElementById('phone').value;
+      const password = document.getElementById('password').value;
+      const confirmPassword = document.getElementById('confirmPassword').value;
+      
+      // Basic validation
+      if (!firstName || !lastName || !email || !phone || !password || !confirmPassword) {
+        alert('Please fill in all fields');
+        return;
+      }
+      
+      // Email validation
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(email)) {
+        alert('Please enter a valid email address');
+        return;
+      }
+      
+      // Password confirmation
+      if (password !== confirmPassword) {
+        alert('Passwords do not match');
+        return;
+      }
+      
+      // Password strength (basic)
+      if (password.length < 6) {
+        alert('Password must be at least 6 characters long');
+        return;
+      }
+      
+      // Register via backend API
+      const registerButton = document.querySelector('.register-button');
+      const originalText = registerButton.textContent;
+      registerButton.textContent = 'Creating Account...';
+      registerButton.disabled = true;
+      
+      // Prepare data for API
+      const registerData = {
+        email: email.toLowerCase(),
+        full_name: firstName + ' ' + lastName,
+        phone: phone,
+        password: password
+      };
+      
+      // Call registration API (relative path to avoid CORS)
+      fetch('/api/auth/register', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(registerData)
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.message && data.message.includes('successfully')) {
+          alert('Account created successfully! You can now sign in.');
+          window.location.href = 'user-login.html';
+        } else {
+          alert(data.message || 'Registration failed. Please try again.');
+          registerButton.textContent = originalText;
+          registerButton.disabled = false;
+        }
+      })
+      .catch(error => {
+        console.error('Registration error:', error);
+        alert('Registration failed. Please try again.');
+        registerButton.textContent = originalText;
+        registerButton.disabled = false;
+      });
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Smart Healthcare Appointment System</title>
+  <meta name="description" content="Integrated platform for appointment booking, real-time queues, and e-prescriptions." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #0f172a;
+      --card: #111827;
+      --muted: #94a3b8;
+      --text: #e5e7eb;
+      --brand: #22c55e;
+      --brand-2: #06b6d4;
+      --accent: #a78bfa;
+      --danger: #ef4444;
+      --warning: #f59e0b;
+      --surface: #0b1220;
+      --ring: rgba(34, 197, 94, 0.35);
+      --shadow: 0 10px 25px rgba(0,0,0,.35);
+      --radius: 14px;
+    }
+    * { box-sizing: border-box; }
+    html, body { height: 100%; }
+    body {
+      margin: 0;
+      font-family: "Inter", system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", sans-serif;
+      color: var(--text);
+      background: radial-gradient(1200px 600px at 20% -10%, rgba(6, 182, 212, 0.2), transparent 60%),
+                  radial-gradient(1000px 500px at 80% 10%, rgba(167, 139, 250, 0.18), transparent 60%),
+                  linear-gradient(180deg, #0b1020 0%, #0a0f1b 100%);
+      min-height: 100%;
+    }
+    a { color: inherit; text-decoration: none; }
+    .container { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
+
+    /* Navbar */
+    .nav {
+      position: sticky; top: 0; z-index: 50;
+      background: rgba(11, 16, 32, 0.7);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+    }
+    .nav-inner {
+      display: flex; align-items: center; justify-content: space-between;
+      height: 64px;
+    }
+    .brand {
+      display: flex; align-items: center; gap: 10px; font-weight: 700;
+      letter-spacing: 0.2px;
+    }
+    .brand-mark {
+      width: 34px; height: 34px; border-radius: 10px;
+      background: conic-gradient(from 180deg at 50% 50%, var(--brand), var(--brand-2), var(--accent), var(--brand));
+      box-shadow: 0 0 0 3px rgba(34,197,94,0.15), 0 8px 20px rgba(6,182,212,0.25);
+    }
+    .nav-links { display: flex; align-items: center; gap: 14px; }
+    .nav-links a {
+      padding: 8px 12px; border-radius: 10px; color: var(--muted);
+      border: 1px solid transparent;
+    }
+    .nav-links a:hover {
+      color: var(--text); border-color: rgba(255,255,255,0.08);
+      background: rgba(255,255,255,0.03);
+    }
+    .cta {
+      background: linear-gradient(135deg, var(--brand), var(--brand-2));
+      color: #051016; padding: 8px 14px; border-radius: 10px; font-weight: 700;
+      box-shadow: 0 6px 20px rgba(34,197,94,0.35);
+      border: 1px solid rgba(255,255,255,0.12);
+    }
+    .cta:hover { filter: brightness(1.05); }
+
+    /* Hero */
+    .hero {
+      padding: 64px 0 24px;
+    }
+    .hero-grid {
+      display: grid; grid-template-columns: 1.1fr 0.9fr; gap: 32px; align-items: center;
+    }
+    .hero-card {
+      background: radial-gradient(600px 200px at 10% 0%, rgba(6,182,212,0.15), transparent 50%),
+                  linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.00));
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: var(--radius);
+      padding: 28px;
+      box-shadow: var(--shadow);
+    }
+    .eyebrow {
+      display: inline-flex; align-items: center; gap: 10px;
+      color: var(--muted); font-weight: 600; letter-spacing: 0.3px;
+      margin-bottom: 10px;
+    }
+    .eyebrow .dot {
+      width: 8px; height: 8px; border-radius: 50%;
+      background: linear-gradient(135deg, var(--brand), var(--accent));
+      box-shadow: 0 0 0 4px rgba(34,197,94,0.15);
+    }
+    h1 {
+      margin: 0 0 10px; font-size: clamp(28px, 5vw, 40px);
+      line-height: 1.15;
+      background: linear-gradient(135deg, #fff, #d5fbe3 35%, #b6f3ff 70%, #e6deff);
+      -webkit-background-clip: text; background-clip: text; color: transparent;
+      text-shadow: 0 10px 40px rgba(34,197,94,0.15);
+    }
+    .abstract {
+      color: var(--muted); margin: 0 0 18px; line-height: 1.6;
+    }
+    .hero-actions { display: flex; gap: 12px; flex-wrap: wrap; }
+
+    /* Feature tiles */
+    .tiles {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 16px; margin-top: 24px;
+    }
+    .tile {
+      background: linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.01));
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 14px; padding: 14px; min-height: 120px;
+      display: flex; flex-direction: column; justify-content: space-between;
+      transition: transform .2s ease, border-color .2s ease, box-shadow .2s ease;
+    }
+    .tile:hover { transform: translateY(-2px); border-color: rgba(255,255,255,0.18); box-shadow: var(--shadow); }
+    .tile h3 { margin: 0 0 8px; font-size: 16px; }
+    .tile p { margin: 0; color: var(--muted); font-size: 14px; line-height: 1.4; }
+    .chip {
+      align-self: flex-start; font-size: 12px; padding: 4px 8px; border-radius: 999px;
+      border: 1px solid rgba(255,255,255,0.12); color: #0a1710;
+      background: linear-gradient(135deg, #b7ffd3, #9df2ff);
+    }
+
+    /* Right visual */
+    .hero-visual {
+      position: relative; min-height: 380px; border-radius: var(--radius);
+      border: 1px solid rgba(255,255,255,0.08);
+      background:
+        radial-gradient(400px 140px at 20% 20%, rgba(34,197,94,0.20), transparent 60%),
+        radial-gradient(400px 140px at 80% 25%, rgba(6,182,212,0.20), transparent 60%),
+        radial-gradient(400px 140px at 50% 70%, rgba(167,139,250,0.18), transparent 60%),
+        linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+    .orb {
+      position: absolute; border-radius: 50%;
+      filter: blur(18px); opacity: 0.85;
+      animation: float 8s ease-in-out infinite;
+      mix-blend-mode: screen;
+    }
+    .orb.green { background: rgba(34,197,94,0.6); width: 180px; height: 180px; top: 16%; left: 12%; animation-delay: 0s; }
+    .orb.cyan  { background: rgba(6,182,212,0.55); width: 130px; height: 130px; top: 45%; right: 18%; animation-delay: 1s; }
+    .orb.purple{ background: rgba(167,139,250,0.6); width: 150px; height: 150px; bottom: 8%; left: 35%; animation-delay: 2s; }
+    @keyframes float {
+      0%, 100% { transform: translateY(0px) translateX(0px); }
+      50%      { transform: translateY(-10px) translateX(6px); }
+    }
+
+    /* Quick links cards */
+    .quick-links {
+      margin: 36px 0 10px;
+      display: grid; grid-template-columns: repeat(5, 1fr); gap: 16px;
+    }
+    .qcard {
+      display: flex; flex-direction: column; justify-content: space-between; gap: 8px;
+      background: linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.015));
+      border: 1px solid rgba(255,255,255,0.08); border-radius: 14px; padding: 16px;
+      transition: transform .2s ease, border-color .2s ease, box-shadow .2s ease;
+    }
+    .qcard:hover { transform: translateY(-3px); border-color: rgba(255,255,255,0.18); box-shadow: var(--shadow); }
+    .qtitle { font-weight: 700; }
+    .qdesc { color: var(--muted); font-size: 14px; }
+    .qcta {
+      margin-top: 6px; align-self: flex-start; font-weight: 600; font-size: 14px;
+      padding: 8px 12px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.12);
+      background: rgba(255,255,255,0.04); color: var(--text);
+    }
+    .qcta:hover { background: rgba(255,255,255,0.07); }
+
+    /* Footer */
+    footer {
+      margin-top: 36px; padding: 20px 0; color: var(--muted); font-size: 14px;
+      border-top: 1px solid rgba(255,255,255,0.06);
+    }
+
+    /* Responsive */
+    @media (max-width: 1024px) {
+      .hero-grid { grid-template-columns: 1fr; }
+      .quick-links { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (max-width: 640px) {
+      .nav-inner { height: auto; padding: 12px 0; gap: 12px; flex-wrap: wrap; }
+      .nav-links { width: 100%; flex-wrap: wrap; gap: 8px; }
+      .tiles { grid-template-columns: 1fr 1fr; }
+      .quick-links { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <header class="nav">
+    <div class="container nav-inner" role="navigation" aria-label="Primary">
+      <div class="brand">
+        <div class="brand-mark" aria-hidden="true"></div>
+        <span>Smart Healthcare</span>
+      </div>
+      <nav class="nav-links">
+        <a href="index.html" aria-current="page">Home</a>
+        <a href="booking.html">Booking</a>
+        <a href="queue.html">Queue</a>
+        <a href="prescriptions.html">Prescriptions</a>
+        <a href="doctors.html">Doctors</a>
+        <a class="cta" href="login.html">Login</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="hero">
+    <div class="container hero-grid">
+      <!-- Left: Intro -->
+      <section class="hero-card">
+        <div class="eyebrow">
+          <span class="dot" aria-hidden="true"></span>
+          Integrated Digital Care Platform
+        </div>
+        <h1>Reimagining Patient–Provider Interactions</h1>
+        <p class="abstract">
+          The proposed Smart Healthcare Appointment System offers an integrated platform for appointment booking,
+          real-time queue monitoring, and electronic prescription management. By leveraging modern technology,
+          the system reduces waiting times, streamlines healthcare delivery, and enhances communication between
+          patients and medical professionals.
+        </p>
+        <div class="hero-actions">
+          <a class="cta" href="booking.html">Book an Appointment</a>
+          <a class="qcta" href="queue.html">View Queue</a>
+          <a class="qcta" href="prescriptions.html">My Prescriptions</a>
+        </div>
+
+        <!-- Feature tiles -->
+        <div class="tiles" aria-label="Platform capabilities">
+          <div class="tile">
+            <h3>Appointment Booking</h3>
+            <p>Find doctors by specialty, select times, and confirm instantly.</p>
+            <span class="chip">Frictionless</span>
+          </div>
+          <div class="tile">
+            <h3>Real-time Queue</h3>
+            <p>Track your live position and estimated wait times.</p>
+            <span class="chip">Live</span>
+          </div>
+          <div class="tile">
+            <h3>e-Prescriptions</h3>
+            <p>Receive, store, and manage prescriptions securely.</p>
+            <span class="chip">Secure</span>
+          </div>
+          <div class="tile">
+            <h3>Doctor Directory</h3>
+            <p>Browse doctors, specialties, and availability.</p>
+            <span class="chip">Discover</span>
+          </div>
+          <div class="tile">
+            <h3>Admin Console</h3>
+            <p>Manage schedules, queues, and prescriptions.</p>
+            <span class="chip">Control</span>
+          </div>
+          <div class="tile">
+            <h3>Reduced Wait</h3>
+            <p>Optimized flow reduces in-clinic waiting times.</p>
+            <span class="chip">Efficient</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- Right: Visual -->
+      <aside class="hero-visual" aria-hidden="true">
+        <div class="orb green"></div>
+        <div class="orb cyan"></div>
+        <div class="orb purple"></div>
+      </aside>
+    </div>
+
+    <!-- Quick links -->
+    <div class="container">
+      <section class="quick-links" aria-label="Quick links">
+        <div class="qcard">
+          <div>
+            <div class="qtitle">Book Appointment</div>
+            <div class="qdesc">Choose specialty, doctor, and time slot.</div>
+          </div>
+          <a class="qcta" href="booking.html">Go to Booking →</a>
+        </div>
+        <div class="qcard">
+          <div>
+            <div class="qtitle">Queue Status</div>
+            <div class="qdesc">Live position and ETA updates.</div>
+          </div>
+          <a class="qcta" href="queue.html">View Queue →</a>
+        </div>
+        <div class="qcard">
+          <div>
+            <div class="qtitle">Prescriptions</div>
+            <div class="qdesc">Access and manage your e‑Rx.</div>
+          </div>
+          <a class="qcta" href="prescriptions.html">Open Prescriptions →</a>
+        </div>
+        <div class="qcard">
+          <div>
+            <div class="qtitle">Doctors</div>
+            <div class="qdesc">Browse specialties and availability.</div>
+          </div>
+          <a class="qcta" href="doctors.html">Find Doctors →</a>
+        </div>
+        <div class="qcard">
+          <div>
+            <div class="qtitle">Login Portal</div>
+            <div class="qdesc">Sign in as Patient, Doctor, or Admin.</div>
+          </div>
+          <a class="qcta" href="login.html">Login →</a>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <footer>
+    <div class="container">
+      © <span id="year"></span> Smart Healthcare. All rights reserved.
+    </div>
+  </footer>
+
+  <script>
+    document.getElementById('year').textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>

@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Queue • Smart Healthcare</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="nav">
+    <div class="container nav-inner">
+      <div class="brand"><div class="brand-mark"></div><span>Smart Healthcare</span></div>
+      <nav class="nav-links">
+        <a href="index.html">Home</a>
+        <a href="booking.html">Booking</a>
+        <a href="queue.html" aria-current="page">Queue</a>
+        <a href="prescriptions.html">Prescriptions</a>
+        <a href="doctors.html">Doctors</a>
+        <a class="cta" href="admin.html">Admin</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="section">
+    <div class="container grid grid-3">
+      <section class="card">
+        <h1 class="h1">Your Queue Status</h1>
+        <p class="muted">Live position and estimated wait time.</p>
+        <div class="tile" style="margin-top:12px;">
+          <h3 style="margin:0">Position: <span id="position">—</span></h3>
+          <p class="muted" style="margin:6px 0 0">Estimated wait: <span id="eta">—</span></p>
+        </div>
+      </section>
+      <section class="card">
+        <h2 class="h1" style="font-size:22px">Notifications</h2>
+        <p class="muted">Enable alerts when your turn is near.</p>
+        <button class="btn" onclick="alert('Notifications enabled (demo)')">Enable Alerts</button>
+      </section>
+      <aside class="card">
+        <h2 class="h1" style="font-size:22px">Tips</h2>
+        <ul class="muted" style="margin:10px 0 0 16px; line-height:1.6;">
+          <li>Arrive 5–10 minutes before your slot</li>
+          <li>Carry your ID and previous records</li>
+        </ul>
+      </aside>
+    </div>
+  </main>
+
+  <footer>
+    <div class="container">© <span id="year"></span> Smart Healthcare</div>
+  </footer>
+
+  <script>
+    document.getElementById('year').textContent = new Date().getFullYear();
+    // Demo values; replace with real-time data later
+    document.getElementById('position').textContent = '5';
+    document.getElementById('eta').textContent = '~18 minutes';
+  </script>
+</body>
+</html>

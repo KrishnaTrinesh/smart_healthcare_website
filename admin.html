@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Admin • Smart Healthcare</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="nav">
+    <div class="container nav-inner">
+      <div class="brand"><div class="brand-mark"></div><span>Smart Healthcare</span></div>
+      <nav class="nav-links">
+        <a href="index.html">Home</a>
+        <a href="booking.html">Booking</a>
+        <a href="queue.html">Queue</a>
+        <a href="prescriptions.html">Prescriptions</a>
+        <a href="doctors.html">Doctors</a>
+        <a class="cta" href="admin.html" aria-current="page">Admin</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="section">
+    <div class="container grid grid-3">
+      <section class="card">
+        <h1 class="h1" style="font-size:22px">Manage Appointments</h1>
+        <p class="muted">Approve, reschedule, or cancel bookings.</p>
+        <button class="btn" style="margin-top:8px">Open</button>
+      </section>
+      <section class="card">
+        <h1 class="h1" style="font-size:22px">Queue Control</h1>
+        <p class="muted">Advance queue, notify patients.</p>
+        <button class="btn" style="margin-top:8px">Open</button>
+      </section>
+      <section class="card">
+        <h1 class="h1" style="font-size:22px">Prescriptions</h1>
+        <p class="muted">Review and issue e‑Rx.</p>
+        <button class="btn" style="margin-top:8px">Open</button>
+      </section>
+    </div>
+  </main>
+
+  <footer>
+    <div class="container">© <span id="year"></span> Smart Healthcare</div>
+  </footer>
+
+  <script>document.getElementById('year').textContent = new Date().getFullYear();</script>
+</body>
+</html>
